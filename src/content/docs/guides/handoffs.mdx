@@ -1,63 +1,124 @@
 ---
 title: Handoffs
-description: Delegate tasks from one agent to another
+description: Learn how agents delegate work to one another (or to humans) to create flexible, specialized multi-agent systems.
 ---
 
-import { Code } from '@astrojs/starlight/components';
-import basicUsageExample from '../../../examples/docs/handoffs/basicUsage.ts?raw';
-import customizeHandoffExample from '../../../examples/docs/handoffs/customizeHandoff.ts?raw';
-import handoffInputExample from '../../../examples/docs/handoffs/handoffInput.ts?raw';
-import inputFilterExample from '../../../examples/docs/handoffs/inputFilter.ts?raw';
-import recommendedPromptExample from '../../../examples/docs/handoffs/recommendedPrompt.ts?raw';
+import { Aside, Steps, Code } from '@astrojs/starlight/components';
 
-Handoffs let an agent delegate part of a conversation to another agent. This is useful when different agents specialise in specific areas. In a customer support app for example, you might have agents that handle bookings, refunds or FAQs.
+Agents are powerful on their own, but **handoffs** allow you to chain them into a collaborative system that solves complex tasks—this is what we call a [Multi-Agent System (MAS)](/guides/multi-agent-systems).
 
-Handoffs are represented as tools to the LLM. If you hand off to an agent called `Refund Agent`, the tool name would be `transfer_to_refund_agent`.
+In simple terms, a *handoff* is when one agent delegates a task to another. This could happen when:
+- The parent agent completes its part of the task.
+- The task requires expertise the parent doesn’t have.
 
-## Creating a handoff
+A handoff does **not** skip the parent agent—it simply extends the workflow. Each agent is still expected to do its job before passing control to the next.
 
-Every agent accepts a `handoffs` option. It can contain other `Agent` instances or `Handoff` objects returned by the `handoff()` helper.
+> ℹ️ Internally, handoffs are implemented as **tools**.  
+> If you hand off to an agent named `Refund Agent`, the LLM sees a tool named `transfer_to_refund_agent`.
+> This is why you can force a handoff by setting `Tool Choice` in [Model Settings](/guides/model-settings) to `required`.
 
-### Basic usage
+---
 
-<Code lang="typescript" code={basicUsageExample} title="Basic handoffs" />
+### 🧠 Example: A Content MAS
 
-### Customising handoffs via `handoff()`
+A common Content MAS might look like this:
 
-The `handoff()` function lets you tweak the generated tool.
+1. **Subject Finder Agent** uses a web search tool to identify trending topics.
+2. It **hands off** the subject to **Content Writer Agent**.
+3. Once written, the draft is handed to **Content Reviewer Agent**.
+4. After review, it’s passed to **Content Publisher Agent**, which uses a tool to publish the result.
 
-- `agent` – the agent to hand off to.
-- `toolNameOverride` – override the default `transfer_to_<agent_name>` tool name.
-- `toolDescriptionOverride` – override the default tool description.
-- `onHandoff` – callback when the handoff occurs. Receives a `RunContext` and optionally parsed input.
-- `inputType` – expected input schema for the handoff.
-- `inputFilter` – filter the history passed to the next agent.
+Every agent contributes to the final outcome. Handoffs allow coordination, not skipping.
 
-<Code
-  lang="typescript"
-  code={customizeHandoffExample}
-  title="Customized handoffs"
-/>
+---
 
-## Handoff inputs
+## Why Use Handoffs?
 
-Sometimes you want the LLM to provide data when invoking a handoff. Define an input schema and use it in `handoff()`.
+| **Pattern**                 | **When to Use**                                              | **Example**                                                                                                                      |
+|----------------------------|--------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| **Triage → Specialist**     | Route to the right expert from a central entry point         | A *Triage Agent* routes shipping questions to **ShippingAgent** and refund issues to **RefundAgent**                            |
+| **Escalation / Fallback**   | Escalate gracefully or recover from failure                  | If **OrderAgent** fails to find an order, it hands off to a human via **LiveAgent**                                             |
+| **Workflow Step**           | Break down complex tasks into stages                         | **CollectorAgent** gathers input, then hands to **GeneratorAgent** for a custom quote                                           |
 
-<Code lang="typescript" code={handoffInputExample} title="Handoff inputs" />
+✅ Handoffs reduce complexity by keeping each agent small, focused, and specialized—helping prevent hallucinations.
 
-## Input filters
+---
 
-By default a handoff receives the entire conversation history. To modify what gets passed to the next agent, provide an `inputFilter`.
-Common helpers live in `@openai/agents-core/extensions`.
+## How Handoffs Work Internally
 
-<Code lang="typescript" code={inputFilterExample} title="Input filters" />
+Every handoff is a tool call. When the parent agent is running, it will automatically select(if needed) the child agent based on the handoff description.
+The child is able to see the results of tool calls of parent agents but the input to the child agent will be the same as the input to the parent agent.
+And the full control of the execution is now delegated to the child agent. 
 
-## Recommended prompts
+---
 
-LLMs respond more reliably when your prompts mention handoffs. The SDK exposes a recommended prefix via `RECOMMENDED_PROMPT_PREFIX`.
+## Designing Great Handoff Descriptions
 
-<Code
-  lang="typescript"
-  code={recommendedPromptExample}
-  title="Recommended prompts"
-/>
+The **Handoff Description** is what helps the parent decide when to delegate. Think of it as a one-line job post for the child.
+
+**Bad ❌**
+```
+
+Can answer shipping.
+
+```
+
+**Good ✅**
+```
+
+Answer questions about shipping methods, costs, delivery times, and tracking numbers. If the user mentions "shipping", "delivery", or "tracking", delegate to me.
+
+```
+
+**Tips:**
+- Be explicit about what you cover.
+- Use keywords the user might mention.
+- Stick to clear, one-sentence statements—avoid fluff.
+
+---
+
+## Context-Aware Handoffs
+
+Just like you can use context variables in the [instructions](/guides/prompt-engineering#personalizing-responses-with-context-variables) of an agent, you can also use context variables in the handoff description of a child agent.
+This is useful when you want to delegate to a child agent based on the context. 
+
+See [Context Variables](/guides/context) for the full reference.
+
+---
+
+<Aside>
+**Note:** Not all MAS types support incoming handoffs.  
+**Content MAS** and **Insights MAS** run in the background and can’t receive handoffs—but they *can* hand off results to a conversational MAS (e.g., Email MAS).
+</Aside>
+
+---
+
+## Configuring Handoffs in the Dashboard
+
+<Steps>
+1. Create child agents with clear handoff descriptions
+1. Create a parent agent
+2. Assign child agents to the parent agent as handoff agents
+</Steps>
+
+That’s it 🎉. When the parent agent is running, it will automatically delegate to the child agents based on the handoff descriptions.
+
+
+---
+
+## Best Practices
+
+✅ **Single Responsibility** – One topic per agent  
+✅ **Clear Delegation Rules** – Help the LLM decide when to hand off  
+✅ **Avoid Long Chains** – No more than 3 handoff levels  
+✅ **Add Human Fallbacks** – Use LiveAgent for edge cases  
+✅ **Iterate Regularly** – Watch transcripts and adjust
+
+---
+
+### Next Steps
+
+- [Writing Effective Agent Instructions](/guides/prompt-engineering)
+- [Single Responsibility Principle](/guides/single-responsibility)
+- [Tools Guide](/guides/tools)
+```

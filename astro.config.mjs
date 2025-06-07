@@ -5,19 +5,6 @@ import { createStarlightTypeDocPlugin } from 'starlight-typedoc';
 import tailwindcss from '@tailwindcss/vite';
 import starlightLlmsTxt from 'starlight-llms-txt';
 
-const [mainStarlightTypeDoc, mainTypeDocSidebarGroup] =
-  createStarlightTypeDocPlugin();
-const [mainRealtimeStarlightTypeDoc, mainRealtimeTypeDocSidebarGroup] =
-  createStarlightTypeDocPlugin();
-const [coreStarlightTypeDoc, coreTypeDocSidebarGroup] =
-  createStarlightTypeDocPlugin();
-const [openaiStarlightTypeDoc, openaiTypeDocSidebarGroup] =
-  createStarlightTypeDocPlugin();
-const [realtimeStarlightTypeDoc, realtimeTypeDocSidebarGroup] =
-  createStarlightTypeDocPlugin();
-const [extensionsStarlightTypeDoc, extensionsTypeDocSidebarGroup] =
-  createStarlightTypeDocPlugin();
-
 const typeDocConfig = {
   useCodeBlocks: true,
   parametersFormat: 'htmlTable',
@@ -28,187 +15,90 @@ const typeDocConfig = {
 
 const plugins = [
   starlightLlmsTxt({
-    projectName: 'OpenAI Agents SDK (TypeScript)',
+    projectName: 'lookfor.ai User Manual',
     customSets: [
       {
         label: 'Guides',
-        description: 'Guides for using the OpenAI Agents SDK',
+        description: 'Guides for using lookfor.ai',
         paths: ['guides/**'],
       },
     ],
-    exclude: ['ja/**'],
   }),
 ];
 
 const sidebar = [
   {
-    label: '👋 Welcome to lookfor.ai',
+    label: 'Welcome',
     link: '/',
-    translations: {
-      ja: '概要',
-    },
+
   },
   {
     label: 'Quickstart',
     link: '/guides/quickstart',
-    translations: {
-      ja: 'クイックスタート',
-    },
+
   },
   {
-    label: 'Guides',
-    translations: {
-      ja: 'ガイド',
-    },
+    label: 'Building Agents',
+
     items: [
       {
         label: 'Agents',
         link: '/guides/agents',
-        translations: {
-          ja: 'エージェント',
-        },
-      },
-      {
-        label: 'Running Agents',
-        link: '/guides/running-agents',
-        translations: {
-          ja: 'エージェントの実行',
-        },
-      },
-      {
-        label: 'Results',
-        link: '/guides/results',
-        translations: {
-          ja: 'エージェントの実行結果',
-        },
-      },
-      {
-        label: 'Tools',
-        link: '/guides/tools',
-        translations: {
-          ja: 'ツール',
-        },
-      },
-      {
-        label: 'Orchestrating multiple agents',
-        link: '/guides/multi-agent',
-        translations: {
-          ja: 'マルチエージェント',
-        },
       },
       {
         label: 'Handoffs',
         link: '/guides/handoffs',
-        translations: {
-          ja: 'ハンドオフ',
-        },
+
       },
       {
-        label: 'Context management',
+        label: 'Tools',
+        link: '/guides/tools',
+
+      },
+       {
+        label: 'Context',
         link: '/guides/context',
-        translations: {
-          ja: 'コンテキスト管理',
-        },
       },
       {
         label: 'Models',
         link: '/guides/models',
-        translations: {
-          ja: 'モデル',
-        },
+
+      },
+      // {
+      //   label: 'Context',
+      //   link: '/guides/context',
+
+      // },      
+      {
+        label: 'Writing Effective Agent Instructions',
+        link: '/guides/prompt-engineering',
+
       },
       {
-        label: 'Guardrails',
-        link: '/guides/guardrails',
-        translations: {
-          ja: 'ガードレール',
-        },
-      },
-      {
-        label: 'Human-in-the-loop',
-        link: '/guides/human-in-the-loop',
-        translations: {
-          ja: '人間の介入（HITL）',
-        },
-      },
-      {
-        label: 'Tracing',
-        link: '/guides/tracing',
-        translations: {
-          ja: 'トレーシング',
-        },
-      },
-      {
-        label: 'Configuring the SDK',
-        link: '/guides/config',
-        translations: {
-          ja: 'SDK の設定',
-        },
-      },
-      {
-        label: 'Troubleshooting',
-        link: '/guides/troubleshooting',
-        translations: {
-          ja: 'トラブルシューティング',
-        },
-      },
+        label: 'Multi-agent Systems',
+        link: '/guides/multi-agent-systems',
+
+      }
     ],
   },
   {
-    label: 'Voice Agents',
-    translations: {
-      ja: '音声エージェント',
-    },
+    label: 'Others',
+
     items: [
       {
-        label: 'Overview',
-        link: '/guides/voice-agents',
-        translations: {
-          ja: '音声エージェントの概要',
-        },
+        label: 'Email Integrations',
+        link: '/guides/others/email-integrations',
+
+      },
+     {
+        label: 'Knowledge Base',
+        link: '/guides/others/knowledge-base',
+
       },
       {
-        label: 'Quickstart',
-        link: '/guides/voice-agents/quickstart',
-        translations: {
-          ja: 'クイックスタート',
-        },
-      },
-      {
-        label: 'Building Voice Agents',
-        link: '/guides/voice-agents/build',
-        translations: {
-          ja: '音声エージェントの構築',
-        },
-      },
-      {
-        label: 'Transport Mechanisms',
-        link: '/guides/voice-agents/transport',
-        translations: {
-          ja: 'リアルタイムトランスポート',
-        },
-      },
-    ],
-  },
-  {
-    label: 'Extensions',
-    translations: {
-      ja: '拡張機能',
-    },
-    items: [
-      {
-        label: 'Use any model with the AI SDK',
-        link: '/extensions/ai-sdk',
-        translations: {
-          ja: 'AI SDK で任意モデルを指定',
-        },
-      },
-      {
-        label: 'Connect Realtime Agents to Twilio',
-        link: '/extensions/twilio',
-        translations: {
-          ja: 'Realtime Agent を Twilio に接続',
-        },
+        label: 'Members',
+        link: '/guides/others/members',
+
       },
     ],
   },
@@ -216,12 +106,11 @@ const sidebar = [
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://openai.github.io',
-  base: 'openai-agents-js',
+  site: 'https://docs.lookfor.ai',
 
   integrations: [
     starlight({
-      title: 'OpenAI Agents SDK',
+      title: 'lookfor.ai User Manual',
       components: {
         SiteTitle: './src/components/Title.astro',
       },
@@ -231,10 +120,7 @@ export default defineConfig({
           label: 'English',
           lang: 'en',
         },
-        ja: {
-          label: '日本語',
-          lang: 'ja',
-        },
+
       },
       social: [
         {

@@ -1,0 +1,186 @@
+---
+title: Writing Effective Agent Instructions
+description: Learn how to write good instructions for your agents.
+---
+import { Aside, Steps, Code } from '@astrojs/starlight/components';
+
+
+*Welcome!* This guide will help you write clear and effective **agent instructions** for your multi‑agent system (MAS). 
+In simple terms, **agent instructions** are the guidelines or “scripts” you give your AI agents so they know how to interact with your customers. 
+Think of it like training a new employee: you tell your AI agents how to greet visitors, how to answer questions, and what tone to use. 
+The good news is you don’t need any technical background or coding knowledge — just a good understanding of your business and customers. 
+By the end of this guide, you’ll feel confident crafting instructions that make your AI agents helpful, friendly, and on‑brand.
+
+> If you want to go deeper, we would recommend you to read [Prompt Engineering by Google](https://drive.google.com/file/d/1AbaBYbEa_EbPelsT40-vj64L-2IwUJHy/view?pli=1)
+> It is a great up-to-date guide, a bit technical but very useful.
+
+## What Are Agent Instructions?
+
+Agent instructions are the custom guidelines you provide to shape your AI agent’s behavior. When you set up an AI agent (for example, a chatbot on your storefront, an automated email responder, or a background content generator), you’ll have a place to enter **instructions**. These are usually a few sentences or bullet points describing what the agent should do (or not do). For instance, you might instruct an agent: *“Always greet the customer politely by first name, answer questions about products, and offer a discount if the cart total is over \$100. Stay friendly and concise.”*
+
+**In plain language:** the instructions tell your AI *“here’s how I want you to act and what I want you to focus on.”* The AI will then follow these guidelines every time it does its work. Good instructions ensure the agent’s output aligns with your store’s voice, policies, and goals.
+
+> **Note:** Agent instructions work behind the scenes. Customers won’t see the instructions, but they will feel the results in the way the agent converses (or writes content, or summarizes chats). By adjusting your instructions, you directly influence the quality of the AI’s work.
+
+## General Prompting Best Practices
+
+Below is a distilled set of *prompt‑engineering* guidelines adapted from the official [OpenAI prompt engineering guide](https://platform.openai.com/docs/guides/prompt-engineering) and tailored to merchants using **Express / Core / Ultra** agents. While our dashboard shields you from most technical parameters, understanding these principles will help you craft clearer, more effective agent instructions and content prompts.
+
+> **Quick start:** Always begin by stating *what the agent should do* in one sentence, then add any important constraints (tone, length, tools). Use triple quotes (`"""`) or hash lines (`###`) to separate your instruction from example text, and include dynamic variables where relevant.
+
+#### 1  Put the Instruction First and Separate Context
+
+Less effective ❌
+
+```
+Summarize the text below as bullets.
+{text input here}
+```
+
+Better ✅
+
+```
+Summarize the text below as bullets.
+
+Text: """
+{text input here}
+"""
+```
+
+#### 2  Be Specific and Detailed
+
+Less effective ❌ `Write a poem about our store.`
+Better ✅ `Write a 4‑line, uplifting poem about eco‑friendly packaging in the style of Maya Angelou.`
+
+#### 3  Show the Desired Output Format
+
+When possible, *show* the agent the exact pattern you expect:
+
+```
+Extract entities and output as:
+Company names: <comma_separated>
+People names: <comma_separated>
+...
+```
+
+#### 4  Start Zero‑Shot → Few‑Shot → Fine‑Tune
+
+1. **Zero‑shot:** give the task only.
+2. **Few‑shot:** add 1‑3 example pairs if zero‑shot is weak.
+3. **Fine‑tune:** contact us if you need custom training.
+
+#### 5  Avoid Vague or Fluffy Phrases
+
+Instead of *"make it a bit shorter"*, say *"Limit to 3 sentences."*
+
+#### 6  Say What *To* Do, Not Only What *Not* to Do
+
+Rather than *"DO NOT ask for password"*, use:
+*"Politely direct users to the ‘Reset Password’ page if they mention login issues; do **not** request any password."*a
+
+## You can lead a horse to water, but you can’t make it drink
+
+It helps to know that under the hood, your agents are powered by advanced AI language models. 
+
+Selecting the right model for your use case is important. Regardless of how good your prompt is, there are certain limitations to each model's capabilities.
+So a less intelligent model may not be able to handle a complex task even if it is described in a great prompt. 
+The way to come up with this problem is to find a perfect combination of model and prompt with repeated testing. One can ask why we don't just use the most powerful model? 
+The answer is that the more powerful the model, the more expensive (in terms of time and money) it is to run. So you need to find a balance between the cost and the performance.
+Especially if a MAS interacts directly with customers (Storefront MAS, Email MAS), you need to ensure that the MAS runs as quick as possible. No one wants to wait for a response for minutes.
+
+A Good Methodology: You can start with Express, and if the Agent is not able to handle the task, you can switch to Core or Ultra. 
+This way you can ensure that the MAS run as quick as possible while still being able to handle the task.
+
+## Personalizing Responses with Context Variables
+
+One powerful feature of agent instructions is the ability to include **[context variables](/guides/context)**. Context variables are placeholders that the system will fill in with actual customer, shop, or session data at runtime. They let your AI personalize its output, making the conversation (or email) feel more natural and tailored to the individual customer.
+
+Here are a few commonly‑used variables you might see in **Storefront** or **Email** MAS:
+
+| Variable               | What it represents                            | Typical use                            |
+| ---------------------- | --------------------------------------------- | -------------------------------------- |
+| `customer.firstName`   | Customer’s first name                         | Personal greetings (*Hi Sarah!*)       |
+| `customer.logged_in`   | `true`/`false` if the customer is logged in   | Change greeting for returning users    |
+| `session.languageCode` | ISO code of visitor’s preferred language      | Multilingual greetings or answers      |
+| `store_status.isOpen`  | `true`/`false` if your physical store is open | Suggest visiting hours or local pickup |
+
+> **Full lists differ for each MAS**. Check the [Context guide](https://lookfor.ai/docs/guides/context) for every available variable in Storefront MAS, Email MAS, and future types.
+
+### How to use them in instructions
+
+Include the variable in back‑ticks inside your instruction text. Example:
+
+> *If `customer.logged_in` is true, greet with “Welcome back, `customer.firstName`!”*
+
+During a live chat, the system might output: “Welcome back, **Sarah**!”. If the value is missing (e.g., the shopper’s name is unknown), your agent will adapt or skip that part.
+
+## Tools: Giving Your Agent Extra Abilities
+
+Beyond chatting, agents can call **tools** — special functions that perform real actions such as looking up a product, creating a discount code, or sending an email. Tools vary by MAS. For storefront agents you might see:
+
+* `GetProductDetailsTool` – fetch real‑time product info.
+* `GetProductRecommendationsTool` – suggest related products.
+* `CreateDiscountCodeTool` – generate a coupon on the fly.
+
+Email agents often use:
+
+* `GetOrderDetailsTool` – pull order data for support responses.
+
+When you **add a tool to your agent**, you’re already giving the agent permission (or a requirement) to use it. 
+Every tool has a description of what it does and how to use it so agent knows how to use it. However, giving 
+specific instructions to the agent about how/when to use the tool is always better. 
+
+Example (Sales Agent):
+
+> *When the shopper requests product specs, use **GetProductDetailsTool** to pull exact dimensions before answering.*
+
+Example (Orders Agent):
+
+> *When the shopper requests order tracking information, first ask for the order number and then use **GetOrderDetailsTool** to pull order data before answering.*
+> If the shopper doesn't know their order number, ask their email and use **GetCustomerOrdersTool** to pull their order list. Then show them the list and ask them to select the order number.
+
+For the full, always‑up‑to‑date tool lists, visit the [Tools guide](https://lookfor.ai/docs/guides/tools).
+
+
+## Examples of Good Instructions
+
+### Example 1: Storefront Chat Agent (Sales & Support)
+
+```
+You are a friendly AI sales assistant for my online store.
+- Greet visitors. If `customer.logged_in` is true, say "Welcome back, `customer.firstName`!".
+- Offer help finding products. Use GetProductDetailsTool if they ask for specs.
+- If their cart value exceeds $100, suggest our free‑shipping promo.
+- Stay upbeat, concise, and helpful.
+```
+
+### Example 2: Email Support Agent (Customer Service)
+
+```
+You are an AI email assistant.
+- Start every email with "Hi `customer.firstName`," followed by appreciation for contacting us.
+- Use GetOrderDetailsTool to include order number and status if the customer’s message mentions shipping or delivery.
+- Apologize for any inconvenience in a warm, professional tone.
+- Offer clear next steps. If a refund is needed, explain the refund process.
+- End with "Best regards, The [Store Name] Team".
+```
+
+*(Full instruction templates and industry‑specific examples can be found in the [Instruction Examples guide](https://lookfor.ai/docs/guides/instructions))*
+
+## Test and Refine Your Instructions (Prompt Iteration)
+
+Writing effective instructions is an interactive process. **Write → test → observe → refine**. Small wording changes can significantly affect agent performance. Use the preview tools in your dashboard for storefront/email agents, or schedule a quick run for Content/Insights MAS to check output quality. Revisit your instructions regularly, especially when you launch new products or promotions.
+
+## Becoming a Pro at Prompting: A Valuable Business Skill
+
+By learning to write effective agent instructions, you’re practising *prompt engineering* – a skill increasingly valued by businesses of all sizes. Each iteration you perform not only improves your store’s AI experience but also sharpens your own ability to communicate with AI tools in marketing, operations, and beyond.
+
+Ready to dive deeper? Explore:
+
+* The [Context guide](/guides/context) – all dynamic variables by MAS type.
+* The [Tools guide](/guides/tools) – every built‑in capability your agents can call.
+* The [MASs guide](/guides/multi-agent-systems) – feature comparison of Storefront, Email, Content, and Conversation Insights MAS.
+
+Happy prompting – and happy selling!
+
+---

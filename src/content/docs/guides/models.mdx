@@ -1,123 +1,37 @@
 ---
 title: Models
-description: Choose and configure language models for your agents
+description: Choose and configure the language models that power your agents
 ---
 
-import { Code } from '@astrojs/starlight/components';
-import modelCustomProviderExample from '../../../examples/docs/models/customProviders.ts?raw';
-import setDefaultOpenAIKeyExample from '../../../examples/docs/config/setDefaultOpenAIKey.ts?raw';
-import modelSettingsExample from '../../../examples/docs/models/modelSettings.ts?raw';
-import agentWithModelExample from '../../../examples/docs/models/agentWithModel.ts?raw';
-import runnerWithModelExample from '../../../examples/docs/models/runnerWithModel.ts?raw';
-import setTracingExportApiKeyExample from '../../../examples/docs/config/setTracingExportApiKey.ts?raw';
+import { Aside } from '@astrojs/starlight/components';
 
-Every Agent ultimately calls an LLM. The SDK abstracts models behind two lightweight
-interfaces:
+Your agents are powered by advanced AI language models (LLMs), which act as the “brain” behind the scenes. You can configure these models to control how your agents behave.
 
-- [`Model`](/openai-agents-js/openai/agents/interfaces/model) – knows how to make _one_ request against a
-  specific API.
-- [`ModelProvider`](/openai-agents-js/openai/agents/interfaces/modelprovider) – resolves human‑readable
-  model **names** (e.g. `'gpt‑4o'`) to `Model` instances.
+### Model Options
 
-In day‑to‑day work you normally only interact with model **names** and occasionally
-`ModelSettings`.
+Each model tier offers a different balance of speed, cost, and intelligence:
 
-<Code
-  lang="typescript"
-  code={agentWithModelExample}
-  title="Specifying a model per‑agent"
-/>
+* **Express** – Lightweight and fast. Ideal for simple tasks and quick replies.
+* **Core** *(default)* – A balanced choice. Handles most customer interactions well.
+* **Ultra** – The most advanced. Excels at understanding complex requests and reasoning step-by-step, though slightly slower.
 
----
+> **Tip:**
+> Start with **Express** to keep your agents fast and cost-efficient. If you notice performance issues or more complex needs, upgrade to **Core** or **Ultra**.
+> For critical tasks, we recommend using **Ultra**.
 
-## The OpenAI provider
+### Additional Settings
 
-The default `ModelProvider` resolves names using the OpenAI APIs. It supports two distinct
-endpoints:
+* **Tool Choice** – Controls how the agent uses tools:
 
-| API              | Usage                                                             | Call `setOpenAIAPI()`                   |
-| ---------------- | ----------------------------------------------------------------- | --------------------------------------- |
-| Chat Completions | Standard chat & function calls                                    | `setOpenAIAPI('chat_completions')`      |
-| Responses        | New streaming‑first generative API (tool calls, flexible outputs) | `setOpenAIAPI('responses')` _(default)_ |
+  * `"auto"` *(default)*: Model decides when to use tools
+  * `"required"`: Tools must always be used
+  * `"none"`: Tool usage is disabled
+* **Parallel Tool Calls** – Enables calling multiple tools at once.
 
-### Authentication
+  * `true` or `false` *(default: false)*
 
-<Code
-  lang="typescript"
-  code={setDefaultOpenAIKeyExample}
-  title="Set default OpenAI key"
-/>
+<Aside type="caution">
+   Advanced settings come with safe defaults. Changing them without understanding their effect may lead to unexpected behavior. Only modify these if you're confident in what they do.
+</Aside>
 
-You can also plug your own `OpenAI` client via `setDefaultOpenAIClient(client)` if you need
-custom networking settings.
-
-### Default model
-
-The OpenAI provider defaults to `gpt‑4o`. Override per agent or globally:
-
-<Code
-  lang="typescript"
-  code={runnerWithModelExample}
-  title="Set a default model"
-/>
-
----
-
-## ModelSettings
-
-`ModelSettings` mirrors the OpenAI parameters but is provider‑agnostic.
-
-| Field               | Type                                       | Notes                                                                     |
-| ------------------- | ------------------------------------------ | ------------------------------------------------------------------------- |
-| `temperature`       | `number`                                   | Creativity vs. determinism.                                               |
-| `topP`              | `number`                                   | Nucleus sampling.                                                         |
-| `frequencyPenalty`  | `number`                                   | Penalise repeated tokens.                                                 |
-| `presencePenalty`   | `number`                                   | Encourage new tokens.                                                     |
-| `toolChoice`        | `'auto' \| 'required' \| 'none' \| string` | See [forcing tool use](/openai-agents-js/guides/agents#forcing-tool-use). |
-| `parallelToolCalls` | `boolean`                                  | Allow parallel function calls where supported.                            |
-| `truncation`        | `'auto' \| 'disabled'`                     | Token truncation strategy.                                                |
-| `maxTokens`         | `number`                                   | Maximum tokens in the response.                                           |
-| `store`             | `boolean`                                  | Persist the response for retrieval / RAG workflows.                       |
-
-Attach settings at either level:
-
-<Code lang="typescript" code={modelSettingsExample} title="Model settings" />
-
-`Runner`‑level settings override any conflicting per‑agent settings.
-
----
-
-## Custom model providers
-
-Implementing your own provider is straightforward – implement `ModelProvider` and `Model` and
-pass the provider to the `Runner` constructor:
-
-<Code
-  lang="typescript"
-  code={modelCustomProviderExample}
-  title="Minimal custom provider"
-/>
-
----
-
-## Tracing exporter
-
-When using the OpenAI provider you can opt‑in to automatic trace export by providing your API
-key:
-
-<Code
-  lang="typescript"
-  code={setTracingExportApiKeyExample}
-  title="Tracing exporter"
-/>
-
-This sends traces to the [OpenAI dashboard](https://platform.openai.com/traces) where you can
-inspect the complete execution graph of your workflow.
-
----
-
-## Next steps
-
-- Explore [running agents](/openai-agents-js/guides/running-agents).
-- Give your models super‑powers with [tools](/openai-agents-js/guides/tools).
-- Add [guardrails](/openai-agents-js/guides/guardrails) or [tracing](/openai-agents-js/guides/tracing) as needed.
+[Learn how to write clear instructions for your agents](/guides/prompt-engineering) to get the best results—regardless of the model tier.

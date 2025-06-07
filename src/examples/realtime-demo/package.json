@@ -10,7 +10,7 @@
     "generate-token": "tsx token.ts"
   },
   "devDependencies": {
-    "@openai/agents-realtime": "workspace:*",
+    "@openai/agents-realtime": "0.0.4",
     "typescript": "~5.8.3",
     "vite": "^6.3.5"
   },

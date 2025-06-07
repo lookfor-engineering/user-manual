@@ -3,107 +3,113 @@ title: Tools
 description: Provide your agents with capabilities via hosted tools or custom function tools
 ---
 
-import { Code } from '@astrojs/starlight/components';
-import toolsFunctionExample from '../../../examples/docs/tools/functionTools.ts?raw';
-import toolsHostedToolsExample from '../../../examples/docs/tools/hostedTools.ts?raw';
-import nonStrictSchemaTools from '../../../examples/docs/tools/nonStrictSchemaTools.ts?raw';
-import agentsAsToolsExample from '../../../examples/docs/tools/agentsAsTools.ts?raw';
+import { Aside, Steps, Code } from '@astrojs/starlight/components';
 
-Tools let an Agent **take actions** – fetch data, call external APIs, execute code, or even use a
-computer. The JavaScript/TypeScript SDK supports three categories:
 
-1. **Hosted tools** – run alongside the model on OpenAI servers. _(web search, file search, computer use, code interpreter, image generation)_
-2. **Function tools** – wrap any local function with a JSON schema so the LLM can call it.
-3. **Agents as tools** – expose an entire Agent as a callable tool.
+You can make your agents more powerful by adding tools to them. Tools let an Agent **take actions** – fetch data, call external APIs, execute code. Lookfor agents supports three categories of tools:
+
+1. **Built-in tools** – These are the tools provided by lookfor.ai. THe availability of tools to an agent depends on the type of the MAS the agent belongs to.
+2. **Agents as tools** – Agents can be used as tools. This is a powerful feature that allows you to create a very flexible and specialized MAS. We will cover this in the [Agents as tools](/guides/tools#2-agents-as-tools) section.
+3. **API tools** – You can create your own API tools. By doing this you can use any API you want. We will cover this in the [API tools](/guides/tools#3-api-tools) section. 
 
 ---
 
-## 1. Hosted tools
+## 1. Built-in tools
 
-When you use the `OpenAIResponsesModel` you can add the following built‑in tools:
+The built-in tools are different for each type of the MAS. See the list of the tools for each type:
+ - [Storefront MAS Tools](/guides/storefront-mas#tools)
+ - [Email MAS Tools](/guides/email-mas#tools)
+ - [Content MAS Tools](/guides/content-mas#tools)
 
-| Tool                    | Type string          | Purpose                               |
-| ----------------------- | -------------------- | ------------------------------------- |
-| Web search              | `'web_search'`       | Internet search.                      |
-| File / retrieval search | `'file_search'`      | Query vector stores hosted on OpenAI. |
-| Computer use            | `'computer'`         | Automate GUI interactions.            |
-| Code Interpreter        | `'code_interpreter'` | Run code in a sandboxed environment.  |
-| Image generation        | `'image_generation'` | Generate images based on text.        |
-
-<Code lang="typescript" code={toolsHostedToolsExample} title="Hosted tools" />
-
-The exact parameter sets match the OpenAI Responses API – refer to the official documentation
-for advanced options like `rankingOptions` or semantic filters.
+ If you have a new tool idea/request, please [let us know](https://tally.so/r/3jqB41). 
 
 ---
 
-## 2. Function tools
+## 2. Agents as tools 
 
-You can turn **any** function into a tool with the `tool()` helper.
+Sometimes you want an Agent to _assist_ another Agent without fully handing off the conversation. 
+To do that, add an agent to the tool list of the agent. 
 
-<Code
-  lang="typescript"
-  code={toolsFunctionExample}
-  title="Function tool with Zod parameters"
-/>
+Under the hood lookfor does the following:
 
-### Options reference
+- Creates a single input parameter.
+- Runs the sub‑MAS with that input when the tool is called. Notice that the sub-agent will not be able to see the conversation history. It won't know it is a part of a MAS. It will think that it runs solely for that input.
+- Returns the final output of the sub-MAS as tool's output to the caller agent.
 
-| Field           | Required | Description                                                                                                                                                                                                          |
-| --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`          | No       | Defaults to the function name (e.g., `get_weather`).                                                                                                                                                                 |
-| `description`   | Yes      | Clear, human-readable description shown to the LLM.                                                                                                                                                                  |
-| `parameters`    | Yes      | Either a Zod schema or a raw JSON schema object. Zod parameters automatically enable **strict** mode.                                                                                                                |
-| `strict`        | No       | When `true` (default), the SDK returns a model error if the arguments don't validate. Set to `false` for fuzzy matching.                                                                                             |
-| `execute`       | Yes      | `(args, context) => string                                                                                               \| Promise<string>`– your business logic. The optional second parameter is the`RunContext`. |
-| `errorFunction` | No       | Custom handler `(context, error) => string` for transforming internal errors into a user-visible string.                                                                                                             |
+Let's say you want to create a MAS that translates French and Turkish texts to English. You can create three agents for that. 
+ - French Translator Agent
+ - Turkish Translator Agent
+ - Orchestrator Agent
+ 
+You can add the French Translator Agent and the Turkish Translator Agent to the tool list of the Orchestrator Agent.
+When the Orchestrator Agent is called, it will run either/both of the agents based on the input like a tool. 
+Let's say half of the input is in French and half of the input is in Turkish. Orchestrator agent will run the French Translator Agent with the French part of the input and the Turkish Translator Agent with the Turkish part of the input.
+Translator agents will not have the conversation history. They will not know that they are a part of a MAS. They will think that they run solely for that input and will return the translated text. 
+Orchestrator agent will return the result of the two agents, edit the text if needed, and return the final result as its output.
 
-### Non‑strict JSON‑schema tools
+<Aside type="caution">
+    Aware that, when you use agent handoffs, the sub-agent will be able to see the [conversation history](/guides/agents#conversation-history).
+    When you use agents as tools, the sub-agent will not be able to see the conversation history. It will think that it runs solely for that input.
+</Aside>
 
-If you need the model to _guess_ invalid or partial input you can disable strict mode when using
-raw JSON schema:
+<Aside type="caution">
+    Output type of a MAS is pre-determined by the type of the MAS. So, any agent that is able to be a final agent in a MAS must have the same output type as the MAS.
+    However, if an agent will only be used as a tool, or there is no possibility to be a final agent in a MAS (e.g. Triage Agent with `Tool Choice` set to `required`), you can set the output type of the agent. 
+</Aside>
 
-<Code
-  lang="typescript"
-  code={nonStrictSchemaTools}
-  title="Non-strict JSON schema tools"
-/>
-
----
-
-## 3. Agents as tools
-
-Sometimes you want an Agent to _assist_ another Agent without fully handing off the
-conversation. Use `agent.asTool()`:
-
-<Code lang="typescript" code={agentsAsToolsExample} title="Agents as tools" />
-
-Under the hood the SDK:
-
-- Creates a function tool with a single `input` parameter.
-- Runs the sub‑agent with that input when the tool is called.
-- Returns either the last message or the output extracted by `customOutputExtractor`.
 
 ---
 
-## Tool use behaviour
+## 3. API tools
 
-Refer to the [Agents guide](/openai-agents-js/guides/agents#forcing-tool-use) for controlling when and how a model
-must use tools (`tool_choice`, `toolUseBehavior`, etc.).
+These are the tools that you can create yourself. You can create your own API tools. By doing this you can use any API you want. 
+Let's say your customers ask estimated delivery time for an order. If your shipping management system has an API to get the estimated delivery time, based on the location of the customer and the order, you can create a tool to call that API.
+To create a tool you need to define the followings:
+
+ - **Name** – the name of the tool.
+ - **Description** – a description of what the tool does.
+ - **Parameters** – the parameters of the tool.
+
+Here is an example of a tool definition. If you want to create an API tool, click on `+` on the tool list. Then you can fill the tool definition.
+```json
+{
+  "name": "Get Estimated Delivery Time Tool",
+  "description": "Get the estimated delivery time using the location and product to be delivered.",
+  "parameters": {
+    "zipCode": " string",
+    "productName": "string"
+  },
+  "Endpoint URL": "https://api.yourcompany.com/delivery-time/{zipCode}?product={productName}",
+  "Method": "GET"
+}
+```
 
 ---
 
-## Best practices
+### Forcing tool use
 
-- **Short, explicit descriptions** – describe _what_ the tool does _and when to use it_.
-- **Validate inputs** – use Zod schemas for strict JSON validation where possible.
-- **Avoid side‑effects in error handlers** – `errorFunction` should return a helpful string, not throw.
-- **One responsibility per tool** – small, composable tools lead to better model reasoning.
+Supplying tools doesn’t guarantee the agent will use one. You can **force** tool use with `Tool Choice` setting in the [Model Settings](/guides/models) of the agent configuration.
+
+### What happens after the tool is used?
+
+The behavior of the agent after the tool is used is determined by the `Tool Use Behavior` setting in the advanced settings of the agent configuration. 
+There are two options for the `Tool Use Behavior` setting:
+
+- `run_llm_again` (default) – run the LLM again with the tool result. (e.g. if the tool is a web search, the agent will run again with the search result)
+Notice that the agent can call another tool after the first tool is used.
+- `stop_on_first_tool` – treat the first tool result as the final answer. (e.g. if the tool is a web search, the agent will stop and return the search result as its answer)
+
+You can also configure the `Tool Use Behavior` setting to stop when any of the listed tools is called.
 
 ---
 
-## Next steps
+## What is lookfor's tool philosophy?
 
-- Learn about [forcing tool use](/openai-agents-js/guides/agents#forcing-tool-use).
-- Add [guardrails](/openai-agents-js/guides/guardrails) to validate tool inputs or outputs.
-- Dive into the TypeDoc reference for [`tool()`](/openai-agents-js/openai/agents/functions/tool) and the various hosted tool types.
+We believe that tools should be small and have a single responsibility.
+They should be like Lego blocks. You can combine them to create complex tools. 
+If you have a set of Lego blocks, there are almost inifinite number of things that you can build with them.
+That is also similar, we don't know what is the limit of the things that can be done with combining tools and agents in a MAS.
+We just know that we will keep adding more atomic tools as primitives and explore more patterns to combine them. 
+Rest of the things are up to you. Do not forget to [let us know](https://tally.so/r/3jqB41) if you have any tool ideas or requests.
+
+---

@@ -1,0 +1,86 @@
+---
+title: Email MAS
+description: Learn what an Email MAS is and how to create one
+---
+
+A **Email MAS** (Multi-Agent System) handles customer conversations from the email. Each agent has access to a predefined set of context variables that provide insights into the customer, session, shop, and navigation state. These can be used in prompts or tool calls to personalize and control behavior.
+
+---
+
+## Context Variables in Email MAS
+
+| **Label**               | **Name**                 | **Description**                          |
+| ----------------------- | ------------------------ | ---------------------------------------- |
+| **Customer ID**         | `customer.id`            | Unique customer identifier               |
+| **Customer First Name** | `customer.firstName`     | First name of the customer               |
+| **Customer Last Name**  | `customer.lastName`      | Last name of the customer                |
+| **Customer Email**      | `customer.email`         | Email address of the customer            |
+| **Customer Phone**      | `customer.phone`         | Phone number of the customer             |
+| **Logged-in?**          | `customer.logged_in`     | True if the customer is authenticated    |
+| **Email Verified?**     | `customer.verifiedEmail` | Whether the customer's email is verified |
+| **Shop MyShopify Domain** | `shop.myshopifyDomain` | The store’s Shopify domain (e.g., `example.myshopify.com`) |
+| **Shop Name** | `shop.name` | Public name of the store |
+| **Shop URL** | `shop.url` | The full public URL of the store |
+| **Shop Email** | `shop.email` | Email address of the store owner |
+| **Shop Currency Code** | `shop.currencyCode` | The currency used by the store (e.g., USD, EUR, GBP) |
+| **Current Time in UTC** | `time.nowInUTC` | Current UTC date and time |
+| **Day of Week in UTC** | `time.dayOfWeekInUTC` | Day of the week in UTC (e.g., Monday) |
+| **Subject** | `email.subject` | Subject line of the email |
+| **From Address** | `email.from.address` | Sender's email address |
+| **From Name** | `email.from.name` | Sender's name |
+| **To Address** | `email.to[].address` | Recipient address in the “To” field |
+| **To Name** | `email.to[].name` | Recipient name in the “To” field |
+| **CC Address** | `email.cc[].address` | Carbon copy recipient address |
+| **CC Name** | `email.cc[].name` | Name of CC recipient |
+| **BCC Address** | `email.bcc[].address` | Blind copy recipient address |
+| **BCC Name** | `email.bcc[].name` | Name of BCC recipient |
+| **In-Reply-To** | `email.inReplyTo` | Email header indicating which message this is replying to |
+| **Reply-To Address** | `email.replyTo.address` | Reply-to email address |
+| **Reply-To Name** | `email.replyTo.name` | Reply-to sender name |
+| **References IDs** | `email.references[]` | Array of message reference IDs for threading |
+| **Attachment Filename** | `email.attachments[].filename` | Filename of the attachment |
+| **Attachment MIME Type** | `email.attachments[].contentType` | File MIME type |
+| **Attachment Size** | `email.attachments[].size` | Size of the attachment in bytes |
+| **Attachment Disposition** | `email.attachments[].disposition` | `inline` or `attachment` |
+| **Attachment CID** | `email.attachments[].contentId` | Content-ID for inline referencing |
+
+---
+
+## Tools Available in Email MAS
+
+| **Tool Name**                    | **Description**                                                                        | **Parameters**                                                                          |
+| -------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `cancel_order`                   | Cancels a Shopify order by ID and reason. Sends refund, restock, and email by default. | `orderId` (string), `reason` (enum: CUSTOMER, DECLINED, FRAUD, INVENTORY, OTHER, STAFF) |
+| `create_discount_code`           | Creates a percentage or fixed discount code, optionally scoped to specific products.   | `type` (percentage \| fixed), `value` (number), `productIds` (string\[])                |
+| `get_customer_orders`            | Fetches customer orders using email with pagination support.                           | `email` (string), `after` (string), `limit` (number)                                    |
+| `get_order_details`              | Fetches detailed information of an order by ID (must start with `#`).                  | `orderId` (string)                                                                      |
+| `get_product_details`            | Retrieves product data by ID, name, or key feature using search or embedding.          | `queryType` (id \| name \| key feature), `queryKey` (string)                            |
+| `get_product_recommendations`    | Recommends products based on query keys and optional filters (price, size).            | `queryKeys` (string\[]), `filters` (object with `price` and `size`)                     |
+| `get_collection_recommendations` | Recommends product collections based on query keys using vector search.                | `queryKeys` (string\[])                                                                 |
+| `get_related_knowledge_source`   | Retrieves FAQs, blog articles, PDFs, or Shopify pages relevant to a question.          | `question` (string), `specificToProductId` (string \| null)                             |
+| `send_email`                     | Sends an email to a customer with subject, plain text body, and HTML content.          | `email` (string), `subject` (string), `body` (string), `html` (string)                  |
+| `send_otp_email`                 | Sends an OTP email to the customer for verification.                                   | `email` (string)                                                                        |
+| `send_note`                      | Sends a private note to the dashboard visible only to store staff.                     | `content` (string)                                                                      |
+
+
+## Type Specific Settings
+
+Currently, there are no type specific settings for Email MAS.
+
+## Email MAS Output Structure
+
+| **Field**                     | **Type**  | **Description**                                                                                              |
+| ----------------------------- | --------- | ------------------------------------------------------------------------------------------------------------ |
+| `content`                     | `string`  | The actual response message that will be sent in the reply email.                                            |
+| `respond_to_email`            | `boolean` | Whether the agent wants to reply to the email.                                                               |
+| `not_respond_to_email_reason` | `string`  | If `respond_to_email` is `false`, this field explains why (e.g., awaiting further info, delegated to human). |
+
+**Example:**
+
+```json
+{
+  "content": "Thanks for reaching out! Your order has been cancelled.",
+  "respond_to_email": true,
+  "not_respond_to_email_reason": ""
+}
+```
