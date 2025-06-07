@@ -69,17 +69,10 @@ const sidebar = [
         },
       },
       {
-        label: 'Running Agents',
-        link: '/guides/running-agents',
+        label: 'Handoffs',
+        link: '/guides/handoffs',
         translations: {
-          ja: 'エージェントの実行',
-        },
-      },
-      {
-        label: 'Results',
-        link: '/guides/results',
-        translations: {
-          ja: 'エージェントの実行結果',
+          ja: 'ハンドオフ',
         },
       },
       {
@@ -90,27 +83,6 @@ const sidebar = [
         },
       },
       {
-        label: 'Orchestrating multiple agents',
-        link: '/guides/multi-agent',
-        translations: {
-          ja: 'マルチエージェント',
-        },
-      },
-      {
-        label: 'Handoffs',
-        link: '/guides/handoffs',
-        translations: {
-          ja: 'ハンドオフ',
-        },
-      },
-      {
-        label: 'Context management',
-        link: '/guides/context',
-        translations: {
-          ja: 'コンテキスト管理',
-        },
-      },
-      {
         label: 'Models',
         link: '/guides/models',
         translations: {
@@ -118,40 +90,26 @@ const sidebar = [
         },
       },
       {
-        label: 'Guardrails',
-        link: '/guides/guardrails',
+        label: 'Context',
+        link: '/guides/context',
         translations: {
-          ja: 'ガードレール',
+          ja: 'コンテキスト管理',
+        },
+      },      
+      {
+        label: 'Writing Effective Agent Instructions',
+        link: '/guides/prompt-engineering',
+        translations: {
+          ja: '指示',
         },
       },
       {
-        label: 'Human-in-the-loop',
-        link: '/guides/human-in-the-loop',
+        label: 'Orchestrating multiple agents',
+        link: '/guides/multi-agent',
         translations: {
-          ja: '人間の介入（HITL）',
+          ja: 'マルチエージェント',
         },
-      },
-      {
-        label: 'Tracing',
-        link: '/guides/tracing',
-        translations: {
-          ja: 'トレーシング',
-        },
-      },
-      {
-        label: 'Configuring the SDK',
-        link: '/guides/config',
-        translations: {
-          ja: 'SDK の設定',
-        },
-      },
-      {
-        label: 'Troubleshooting',
-        link: '/guides/troubleshooting',
-        translations: {
-          ja: 'トラブルシューティング',
-        },
-      },
+      }
     ],
   },
   {
@@ -216,12 +174,12 @@ const sidebar = [
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://openai.github.io',
-  base: 'openai-agents-js',
+  site: 'https://lookfor.ai',
+  base: 'user-manual',
 
   integrations: [
     starlight({
-      title: 'OpenAI Agents SDK',
+      title: 'lookfor.ai User Manual',
       components: {
         SiteTitle: './src/components/Title.astro',
       },

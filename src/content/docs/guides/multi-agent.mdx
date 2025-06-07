@@ -7,18 +7,71 @@ import simpleStorefrontMASArc from "../../../assets/simple-storefront-mas-arc.pn
 import { Image } from 'astro:assets';
 
 
-Orchestration refers to the flow of agents. Which agents run, in what order, and how do they decide what happens next? Intelligence of an LLM is used to plan, reason, and decide on what steps to take based on that.
+Orchestration refers to defining the flow of agents. Which agents run, in what order, 
+and how do they decide what happens next? Intelligence of an LLM is used to plan, reason, 
+and decide on what steps to take based on that. MAS is actually an abstract concept so the flow of a MAS is actually defined when creating itsAgents. 
+There are three main parameters of an Agent that controls the flow of a MAS:
+- **Entry Agent**: This is a very basic configuration for an Agent. You can select the agent that will be the entry point of the MAS.
+Then the agent will be the first one to run. Remember that there can be only one entry agent per MAS.
+- **Handoffs**: This is the mechanism to delegate a task to a sub-agent. You can define agents that the current agent can delegate to. 
+Then starting from the entry agent, the MAS will run the agents in the order of the handoffs.
+- **Handoff Description**: Every agent can have a description of what it can do. This description is used to decide which agent to delegate to.
+So a handoff description informs the parent agent about the capabilities of the child agent. (e.g. "Use me when the customer asks for order cancellation")
 
-See the following basic Storefront MAS architecture. This MAS has a triage agent which breasts the initial query and transfers the control to one of the three agents. Notice that there is an Order Cancellation Agent that Orders Agent can delagate to. This is a good practice because cancelling orders is a critical task and should be performed by a specialized agent. If possible, a more intelligent model should be used. 
+### A Basic Storefront MAS Example
 
+The tree below shows a basic Storefront MAS. It has a triage agent which breasts the initial query and transfers the control to one of the three agents: Sales Agent, Orders Agent, or Discounts Agent.
+Notice that there is an Order Cancellation Agent that Orders Agent can delagate to. This is a good practice because 
+cancelling orders is a critical task and should be performed by a specialized agent. If possible, a more intelligent model should be used. 
+
+The following diagram is from the dashboard, when you define your agents, you can see the auto-generated flow of the agents on the Home page of the MAS.
 <Image  src={simpleStorefrontMASArc} alt="Simple Storefront MAS Architecture"/>
 
-An agent is an LLM equipped with instructions, tools and handoffs. This means that given an open-ended task, the LLM can autonomously plan how it will tackle the task, using tools to take actions and acquire data, and using handoffs to delegate tasks to sub-agents. For example, an orders agent could be equipped with tools like:
-
-- Get Order Details to retrieve order's details by its id
-- Get Customer Orders to list customer's orders by their email
-- Update Order to update any detail of an order
-- Handoffs to specialized agents that does cancelling or refund. 
+```
+Triage Agent:
+- Handoff Description: ""
+- Instructions: "You're the triage agent, your job is to determine which agents to be used based on the customer query. If the query is about sales you need to use Sales Agent. If the query is about shipping, orders etc. You need to use Orders agent. If the query is about discount you need to use Discount Agent."
+- Handoff Agents: [Orders Agent, Discounts Agent, Sales Agent]
+- Entry Agent: True
+- Model: Express
+- Tool Choice: Required (Remember that Agents see handoffs as tools so if you want an agent to always use a handoff, you need to select "Required")
+```
+```
+Sales Agent:
+- Handoff Description: "Use me when the customer asks for product details"
+- Instructions: "You are the pre-sales assistant for `Shop Name` , your job is to help customers to find the relevant item by making a pre-sales dialogue based on store's category, always try to swap-domain specific dialogues. If a customer wants to learn about product details, you need to ask which products they are interested in. Then you call `Get Product Details` tool by retrieving product's name or ID. You can also use `Get Related Knowledge Source` tool to retrive store specific answers. For example, if user is asking about the return policy you can answer them."
+- Handoff Agents: []
+- Entry Agent: False
+- Model: Core
+- Tool Choice: Auto
+```
+```
+Orders Agent:
+- Handoff Description: "Use this handoff when a query is about orders or order details. Orders Agent can: `Get Customer Orders`, `Get Order Details` or delegate to `Order Cancellation Agent`"
+- Instructions: "Use this agent to respond support queries. You can use `Get Customer Orders` tool to list the customer orders. When a customer wants to track their orders you need to ask their order address first, then call `Get Order Details` tool to learn the status of their orders."
+- Handoff Agents: [Order Cancellation Agent]
+- Entry Agent: False
+- Model: Express
+- Tool Choice: Auto
+```
+```
+Discount Agent:
+- Handoff Description: "Use this agent when a customer wants discount or finds prices too high. You can call `Create Dicount Code` tool to create one time discount and use `Send OTP Email` tool to send the verification code to the customer."
+- Instructions: "Use this agent to respond support queries. You can use `Get Customer Orders` tool to list the customer orders. When a customer wants to track their orders you need to ask their order address first, then call `Get Order Details` tool to learn the status of their orders."
+- Handoff Agents: []
+- Entry Agent: False
+- Model: Express
+- Tool Choice: Auto
+```
+```
+Order Cancellation Agent:
+- Handoff Description: "Use this agent when the customer asked to cancel an order."
+- Instructions: "Use this agent to cancel an order. You can use `Cancel Order` tool to cancel the order. Most imporantly check if the customer asking to cancel an order is the owner of the order. If the `Customer Logged In` parameter is true and `Customer Email` is the same as the order's email, then you can cancel the order. If not, send an OTP email to order's email using `Send OTP Email` tool to verify the customer's identity."
+- Handoff Agents: []
+- Entry Agent: False
+- Model: Express
+- Tool Choice: Auto
+```
 
 This pattern is great when the task is open-ended and you want to rely on the intelligence of an LLM. The most important tactics here are:
 

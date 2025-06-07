@@ -12,66 +12,26 @@ import agentsAsToolsExample from '../../../examples/docs/tools/agentsAsTools.ts?
 Tools let an Agent **take actions** – fetch data, call external APIs, execute code, or even use a
 computer. The JavaScript/TypeScript SDK supports three categories:
 
-1. **Hosted tools** – run alongside the model on OpenAI servers. _(web search, file search, computer use, code interpreter, image generation)_
-2. **Function tools** – wrap any local function with a JSON schema so the LLM can call it.
-3. **Agents as tools** – expose an entire Agent as a callable tool.
+1. **Built-in tools** – These are the tools provided by lookfor.ai. THe availability of tools to an agent depends on the type of the MAS the agent belongs to.
+2. **Agents as tools** – Agents can be used as tools. This is a powerful feature that allows you to create a very flexible and specialized MAS. We will cover this in the [Agents as tools](/user-manual/guides/tools#agents-as-tools) section.
+3. **API tools** – You can create your own API tools. By doing this you can use any API you want. We will cover this in the [API tools](/user-manual/guides/tools#api-tools) section. 
 
 ---
 
-## 1. Hosted tools
+## 1. Built-in tools
 
-When you use the `OpenAIResponsesModel` you can add the following built‑in tools:
-
-| Tool                    | Type string          | Purpose                               |
-| ----------------------- | -------------------- | ------------------------------------- |
-| Web search              | `'web_search'`       | Internet search.                      |
-| File / retrieval search | `'file_search'`      | Query vector stores hosted on OpenAI. |
-| Computer use            | `'computer'`         | Automate GUI interactions.            |
-| Code Interpreter        | `'code_interpreter'` | Run code in a sandboxed environment.  |
-| Image generation        | `'image_generation'` | Generate images based on text.        |
-
-<Code lang="typescript" code={toolsHostedToolsExample} title="Hosted tools" />
-
-The exact parameter sets match the OpenAI Responses API – refer to the official documentation
-for advanced options like `rankingOptions` or semantic filters.
+The built-in tools are different for each type of the MAS. See the list of the tools for each type:
+ - [Storefront MAS Tools](/user-manual/guides/storefront-mas#tools)
+ - [Email MAS Tools](/user-manual/guides/email-mas#tools)
+ - [Content MAS Tools](/user-manual/guides/content-mas#tools)
+ - [Marketing MAS Tools](/user-manual/guides/marketing-mas#tools)
+ - [Sales MAS Tools](/user-manual/guides/sales-mas#tools)
+ - [Customer Support MAS Tools](/user-manual/guides/customer-support-mas#tools)
+ - [Product Management MAS Tools](/user-manual/guides/product-management-mas#tools)
 
 ---
 
-## 2. Function tools
-
-You can turn **any** function into a tool with the `tool()` helper.
-
-<Code
-  lang="typescript"
-  code={toolsFunctionExample}
-  title="Function tool with Zod parameters"
-/>
-
-### Options reference
-
-| Field           | Required | Description                                                                                                                                                                                                          |
-| --------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`          | No       | Defaults to the function name (e.g., `get_weather`).                                                                                                                                                                 |
-| `description`   | Yes      | Clear, human-readable description shown to the LLM.                                                                                                                                                                  |
-| `parameters`    | Yes      | Either a Zod schema or a raw JSON schema object. Zod parameters automatically enable **strict** mode.                                                                                                                |
-| `strict`        | No       | When `true` (default), the SDK returns a model error if the arguments don't validate. Set to `false` for fuzzy matching.                                                                                             |
-| `execute`       | Yes      | `(args, context) => string                                                                                               \| Promise<string>`– your business logic. The optional second parameter is the`RunContext`. |
-| `errorFunction` | No       | Custom handler `(context, error) => string` for transforming internal errors into a user-visible string.                                                                                                             |
-
-### Non‑strict JSON‑schema tools
-
-If you need the model to _guess_ invalid or partial input you can disable strict mode when using
-raw JSON schema:
-
-<Code
-  lang="typescript"
-  code={nonStrictSchemaTools}
-  title="Non-strict JSON schema tools"
-/>
-
----
-
-## 3. Agents as tools
+## 2. Agents as tools 
 
 Sometimes you want an Agent to _assist_ another Agent without fully handing off the
 conversation. Use `agent.asTool()`:
@@ -86,12 +46,60 @@ Under the hood the SDK:
 
 ---
 
-## Tool use behaviour
+## 3. API tools
 
-Refer to the [Agents guide](/openai-agents-js/guides/agents#forcing-tool-use) for controlling when and how a model
-must use tools (`tool_choice`, `toolUseBehavior`, etc.).
+These are the tools that you can create yourself. You can create your own API tools. By doing this you can use any API you want. 
+Let's say your customers ask estimated delivery time for an order. If your shipping management system has an API to get the estimated delivery time, based on the location of the customer and the order, you can create a tool to call that API.
+To create a tool you need to define the followings:
+
+ - **Name** – the name of the tool.
+ - **Description** – a description of what the tool does.
+ - **Parameters** – the parameters of the tool.
+
+Here is an example of a tool definition. If you want to create an API tool, click on `+` on the tool list. Then you can fill the tool definition.
+```json
+{
+  "name": "Get Estimated Delivery Time Tool",
+  "description": "Get the estimated delivery time using the location and product to be delivered.",
+  "parameters": {
+    "zipCode": " string",
+    "productName": "string"
+  },
+  "Endpoint URL": "https://api.yourcompany.com/delivery-time/{zipCode}?product={productName}",
+  "Method": "GET"
+}
+```
 
 ---
+
+## Tools
+
+You can supply tools to an agent. Tools are functions or APIs that the agent can invoke to accomplish a task. 
+There are many built-in tools available for agents. The available tools are different for each type of the MAS.
+There are many configuration options for the tools. Go to the [tools](/openai-agents-js/guides/tools) guide to learn more about the tools.
+You can find the list of the tools for each type of the MAS [here](https://lookfor.ai/docs/guides/tools).
+You can also [create your own API tools](/openai-agents-js/guides/tools) or [propose new tools to us](https://tally.so/r/3jqB41).
+
+
+### Forcing tool use
+
+Supplying tools doesn’t guarantee the agent will use one. You can **force** tool use with
+`Tool Choice` setting in the advanced settings of the agent configuration:
+
+1. `'auto'` (default) – the agent decides whether to use a tool.
+2. `'required'` – the agent _must_ call a tool (it can choose which one). If you remember every handoff is a tool, you can use this setting to force the agent to delegate to another agent.
+3. `'none'` – the agent must **not** call a tool.
+
+### What happens after the tool is used?
+The behavior of the agent after the tool is used is determined by the `Tool Use Behavior` setting in the advanced settings of the agent configuration. 
+There are two options for the `Tool Use Behavior` setting:
+
+- `run_llm_again` (default) – run the LLM again with the tool result. (e.g. if the tool is a web search, the agent will run again with the search result)
+Notice that the agent can call another tool after the first tool is used.
+- `stop_on_first_tool` – treat the first tool result as the final answer. (e.g. if the tool is a web search, the agent will stop and return the search result as its answer)
+
+You can also configure the `Tool Use Behavior` setting to stop when any of the listed tools is called.
+
 
 ## Best practices
 

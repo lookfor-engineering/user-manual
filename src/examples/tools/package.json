@@ -2,7 +2,7 @@
   "private": true,
   "name": "tools",
   "dependencies": {
-    "@openai/agents": "workspace:*",
+    "@openai/agents": "0.0.4",
     "playwright": "^1.52.0",
     "zod": "~3.25.40"
   },

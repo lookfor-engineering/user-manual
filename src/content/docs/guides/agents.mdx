@@ -3,7 +3,6 @@ title: Agents
 description: Learn more about how to define agents in the OpenAI Agents SDK for JavaScript / TypeScript
 ---
 
-import { Code } from '@astrojs/starlight/components';
 import simpleAgent from '../../../examples/docs/agents/simpleAgent.ts?raw';
 import agentWithTools from '../../../examples/docs/agents/agentWithTools.ts?raw';
 import agentWithContext from '../../../examples/docs/agents/agentWithContext.ts?raw';
@@ -13,17 +12,36 @@ import agentWithDynamicInstructions from '../../../examples/docs/agents/agentWit
 import agentWithLifecycleHooks from '../../../examples/docs/agents/agentWithLifecycleHooks.ts?raw';
 import agentCloning from '../../../examples/docs/agents/agentCloning.ts?raw';
 import agentForcingToolUse from '../../../examples/docs/agents/agentForcingToolUse.ts?raw';
+import { Aside, Steps, Code } from '@astrojs/starlight/components';
 
 Agents are the main building‑block of a multi-agent system. Each agent is a proxy for an LLM. 
 Each agent has a set of tools and context. Each agent can use these tools and context to complete its task.
-In short, LLM is the brain of the agent, tools are the hands and context is the eyes.
-
+In short, LLM is the brain of the agent, tools are the hands and context is the eyes. Agents has the following parameters that you can configure:
 - **Name** – the name of the agent.
+- **Handoff Description** – a description of what the agent can do. This description is used to decide which agent to delegate to. So a handoff description informs the parent agent about the capabilities of the child agent.
 - **Instructions** – the system prompt that tells the agent _who it is_ and _how it should respond_.
-- **Model** – determines how intelligent the agent is. The more intelligent the model, the more complex the agent can be. However, the more complex the agent, the more expensive it is to run in time and money.
+- **Handoff Agents** – a list of agents that the current agent can delegate to.
 - **Tools** – a list of functions or APIs the model can invoke to accomplish a task. Depending on the type of the MAS, lookfor provides a set of useful tools for you to equip an agent of the MAS.
+- **Entry Agent** – a boolean value that indicates if the agent is the entry point of the MAS.
+- **Model** – determines how intelligent the agent is. The more intelligent the model, the more complex the agent can be. However, the more complex the agent, the more expensive it is to run in time and money.
+- **Tool Choice** – "auto" (default), "required" or "none" – the agent decides whether to use a tool.
+
+
+<Aside type="caution">
+    LLMs [hallucinate](https://en.wikipedia.org/wiki/Hallucination_(artificial_intelligence)). This means that they may generate content that is not true to the facts or do not follow the instructions. 
+    [Writing Effective Agent Instructions](/openai-agents-js/guides/prompt-engineering) and [Following Single Responsibility Principle](/openai-agents-js/guides/single-responsibility) are powerful weapons to reduce hallucinations.
+    Also the more intelligent the model, the more likely it is to hallucinate because it will understand the instructions better.
+</Aside>
 
 ---
+
+### Why don't lookfor configure agents for you? 
+Learning how to build multi-agent systems can be a bit scary at the beginning. Actually, they are very intuitive and easy to understand.
+As lookfor, we prepared everything for you. You just need to set up the MASs using our app. You may be wondering why we don't configure agents for you.
+The reason is there are many different stores in Shopify. Each store has its own unique requirements. We can't create a one-size-fits-all solution.
+Instead, what we provide is a framework and infrastructure that you can use to build and run your own MASs. This guide is a good starting point to learn how to build your own MASs but of course you can always ask us for help.
+
+--- 
 
 ## Context
 
@@ -53,14 +71,7 @@ As an example, for a storefront MAS, we provide the following variables:
 
 You can say in the instructions that if `customer.isLoggedIn` is true, you should say "Hello `customer.name`".
 
-See the [instructions](/openai-agents-js/guides/instructions) guide to learn how to write good instructions.
-
-> The task of writing instructions for LLMs are called **prompt engineering**. 
-> It is a complex topic and there are many resources available online but in the end it is trial and error.
-> You should try different instructions and see what works best for your use case. 
-> It is obvious that LLMs will be an important part of our lives and basically everyone will be a prompt engineer.
-> Think of it like **searching the web**, ones who used search engines efficiently in the last 20 years created many opportunities, it will be the case for LLMs. 
-> There is no better time than now to learn prompt engineering. If you have any questions, please reach out to us. We can guide you.
+See the [Writing Effective Agent Instructions](/user-manual/guides/prompt-engineering) guide to learn how to write good instructions.
 
 ---
 
@@ -82,20 +93,11 @@ See the [models](/openai-agents-js/guides/models) guide to learn more about mode
 
 You can supply tools to an agent. Tools are functions or APIs that the agent can invoke to accomplish a task. 
 There are many built-in tools available for agents. The available tools are different for each type of the MAS.
+There are many configuration options for the tools. Go to the [tools](/openai-agents-js/guides/tools) guide to learn more about the tools.
 You can find the list of the tools for each type of the MAS [here](https://lookfor.ai/docs/guides/tools).
 You can also [create your own API tools](/openai-agents-js/guides/tools) or [propose new tools to us](https://tally.so/r/3jqB41).
 
 --- 
-
-## Forcing tool use
-
-Supplying tools doesn’t guarantee the agent will use one. You can **force** tool use with
-`Tool Choice` setting in the advanced settings of the agent configuration:
-
-1. `'auto'` (default) – the agent decides whether to use a tool.
-2. `'required'` – the agent _must_ call a tool (it can choose which one). If you remember every handoff is a tool, you can use this setting to force the agent to delegate to another agent.
-3. `'none'` – the agent must **not** call a tool.
-
 
 ## Next steps
 
