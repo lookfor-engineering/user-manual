@@ -1,0 +1,27 @@
+---
+title: Multi-agent Systems - Orchestrating multiple agents
+description: Coordinate the flow between several agents
+---
+
+import simpleStorefrontMASArc from "../../../assets/simple-storefront-mas-arc.png";
+import { Image } from 'astro:assets';
+
+
+Orchestration refers to the flow of agents. Which agents run, in what order, and how do they decide what happens next? Intelligence of an LLM is used to plan, reason, and decide on what steps to take based on that.
+
+See the following basic Storefront MAS architecture. This MAS has a triage agent which breasts the initial query and transfers the control to one of the three agents. Notice that there is an Order Cancellation Agent that Orders Agent can delagate to. This is a good practice because cancelling orders is a critical task and should be performed by a specialized agent. If possible, a more intelligent model should be used. 
+
+<Image  src={simpleStorefrontMASArc} alt="Simple Storefront MAS Architecture"/>
+
+An agent is an LLM equipped with instructions, tools and handoffs. This means that given an open-ended task, the LLM can autonomously plan how it will tackle the task, using tools to take actions and acquire data, and using handoffs to delegate tasks to sub-agents. For example, an orders agent could be equipped with tools like:
+
+- Get Order Details to retrieve order's details by its id
+- Get Customer Orders to list customer's orders by their email
+- Update Order to update any detail of an order
+- Handoffs to specialized agents that does cancelling or refund. 
+
+This pattern is great when the task is open-ended and you want to rely on the intelligence of an LLM. The most important tactics here are:
+
+1. Invest in good prompts. Make it clear what tools are available, how to use them, and what parameters it must operate within.
+2. Monitor your MAS and iterate on it. See where things go wrong, and iterate on your prompts.
+3. Have specialized agents that excel in one task, rather than having a general purpose agent that is expected to be good at anything.
