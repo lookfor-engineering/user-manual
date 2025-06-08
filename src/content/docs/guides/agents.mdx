@@ -1,18 +1,9 @@
 ---
 title: Agents
-description: Learn more about how to define agents in the OpenAI Agents SDK for JavaScript / TypeScript
+description: Learn more about how to define agents in the lookfor.ai
 ---
 
-import simpleAgent from '../../../examples/docs/agents/simpleAgent.ts?raw';
-import agentWithTools from '../../../examples/docs/agents/agentWithTools.ts?raw';
-import agentWithContext from '../../../examples/docs/agents/agentWithContext.ts?raw';
-import agentWithAodOutputType from '../../../examples/docs/agents/agentWithAodOutputType.ts?raw';
-import agentWithHandoffs from '../../../examples/docs/agents/agentWithHandoffs.ts?raw';
-import agentWithDynamicInstructions from '../../../examples/docs/agents/agentWithDynamicInstructions.ts?raw';
-import agentWithLifecycleHooks from '../../../examples/docs/agents/agentWithLifecycleHooks.ts?raw';
-import agentCloning from '../../../examples/docs/agents/agentCloning.ts?raw';
-import agentForcingToolUse from '../../../examples/docs/agents/agentForcingToolUse.ts?raw';
-import { Aside, Steps, Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
 
 Agents are the main building‑block of a multi-agent system. Each agent is a proxy for an LLM. 
 Each agent has a set of tools and context. Each agent can use these tools and context to complete its task.
@@ -96,11 +87,3 @@ There are many built-in tools available for agents. The available tools are diff
 There are many configuration options for the tools. Go to the [tools](/openai-agents-js/guides/tools) guide to learn more about the tools.
 You can find the list of the tools for each type of the MAS [here](https://lookfor.ai/docs/guides/tools).
 You can also [create your own API tools](/openai-agents-js/guides/tools) or [propose new tools to us](https://tally.so/r/3jqB41).
-
---- 
-
-## Next steps
-
-- Learn how to [run agents](/openai-agents-js/guides/running-agents).
-- Dive into [tools](/openai-agents-js/guides/tools), [guardrails](/openai-agents-js/guides/guardrails), and [models](/openai-agents-js/guides/models).
-- Explore the full TypeDoc reference under **@openai/agents** in the sidebar.

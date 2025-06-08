@@ -3,69 +3,28 @@ title: Models
 description: Choose and configure language models for your agents
 ---
 
-import { Code } from '@astrojs/starlight/components';
-import modelCustomProviderExample from '../../../examples/docs/models/customProviders.ts?raw';
-import setDefaultOpenAIKeyExample from '../../../examples/docs/config/setDefaultOpenAIKey.ts?raw';
-import modelSettingsExample from '../../../examples/docs/models/modelSettings.ts?raw';
-import agentWithModelExample from '../../../examples/docs/models/agentWithModel.ts?raw';
-import runnerWithModelExample from '../../../examples/docs/models/runnerWithModel.ts?raw';
-import setTracingExportApiKeyExample from '../../../examples/docs/config/setTracingExportApiKey.ts?raw';
+import { Aside } from '@astrojs/starlight/components';
 
-Every Agent ultimately calls an LLM. The SDK abstracts models behind two lightweight
-interfaces:
 
-- [`Model`](/openai-agents-js/openai/agents/interfaces/model) – knows how to make _one_ request against a
-  specific API.
-- [`ModelProvider`](/openai-agents-js/openai/agents/interfaces/modelprovider) – resolves human‑readable
-  model **names** (e.g. `'gpt‑4o'`) to `Model` instances.
+It helps to know that under the hood, your agents are powered by advanced AI language models. 
+So every Agent ultimately calls an LLM. We won’t dive into technical model names (no need to worry about GPTs or anything like that). 
+Instead, our platform keeps it simple with three AI levels: **Express**, **Core**, and **Ultra**. Each level corresponds to a different power of the AI brain:
 
-In day‑to‑day work you normally only interact with model **names** and occasionally
-`ModelSettings`.
+* **Express** — A lightweight, fast model. Great for quick, simple answers and basic tasks.
+* **Core** — A balanced model. Good all‑around capabilities for most customer interactions.
+* **Ultra** — The most powerful model. Thinks step by step and excels at understanding complex questions and giving detailed answers, though it may be a bit slower.
 
-<Code
-  lang="typescript"
-  code={agentWithModelExample}
-  title="Specifying a model per‑agent"
-/>
+No matter which level you choose for your agent, the way to get great results is the same: provide clear instructions. [Learn more about how to write great instructions](/user-manual/guides/prompt-engineering)
 
+> **Tip:** Select the right model tier for your use case is important. You can start with Express, and if the Agent is not able to handle the task, 
+you can switch to Core or Ultra. This way you can ensure that the MAS run as quick as possible.
+> We suggest you to use Ultra if the task is critical.
 ---
 
-## The OpenAI provider
 
-The default `ModelProvider` resolves names using the OpenAI APIs. It supports two distinct
-endpoints:
+## Model Settings
 
-| API              | Usage                                                             | Call `setOpenAIAPI()`                   |
-| ---------------- | ----------------------------------------------------------------- | --------------------------------------- |
-| Chat Completions | Standard chat & function calls                                    | `setOpenAIAPI('chat_completions')`      |
-| Responses        | New streaming‑first generative API (tool calls, flexible outputs) | `setOpenAIAPI('responses')` _(default)_ |
-
-### Authentication
-
-<Code
-  lang="typescript"
-  code={setDefaultOpenAIKeyExample}
-  title="Set default OpenAI key"
-/>
-
-You can also plug your own `OpenAI` client via `setDefaultOpenAIClient(client)` if you need
-custom networking settings.
-
-### Default model
-
-The OpenAI provider defaults to `gpt‑4o`. Override per agent or globally:
-
-<Code
-  lang="typescript"
-  code={runnerWithModelExample}
-  title="Set a default model"
-/>
-
----
-
-## ModelSettings
-
-`ModelSettings` mirrors the OpenAI parameters but is provider‑agnostic.
+We provide a few settings to configure the model of an Agent. You can set them in Advanced Settings of an Agent. 
 
 | Field               | Type                                       | Notes                                                                     |
 | ------------------- | ------------------------------------------ | ------------------------------------------------------------------------- |
@@ -73,65 +32,11 @@ The OpenAI provider defaults to `gpt‑4o`. Override per agent or globally:
 | `topP`              | `number`                                   | Nucleus sampling.                                                         |
 | `frequencyPenalty`  | `number`                                   | Penalise repeated tokens.                                                 |
 | `presencePenalty`   | `number`                                   | Encourage new tokens.                                                     |
-| `toolChoice`        | `'auto' \| 'required' \| 'none' \| string` | See [forcing tool use](/openai-agents-js/guides/agents#forcing-tool-use). |
-| `parallelToolCalls` | `boolean`                                  | Allow parallel function calls where supported.                            |
-| `truncation`        | `'auto' \| 'disabled'`                     | Token truncation strategy.                                                |
 | `maxTokens`         | `number`                                   | Maximum tokens in the response.                                           |
-| `store`             | `boolean`                                  | Persist the response for retrieval / RAG workflows.                       |
 
-Attach settings at either level:
-
-<Code lang="typescript" code={modelSettingsExample} title="Model settings" />
-
-`Runner`‑level settings override any conflicting per‑agent settings.
+<Aside type="caution">
+   Advanced settings have default values. Changing them without understanding the impact may cause unexpected results.
+   Please only change them if you know what you are doing.
+</Aside>
 
 ---
-
-## Custom model providers
-
-Implementing your own provider is straightforward – implement `ModelProvider` and `Model` and
-pass the provider to the `Runner` constructor:
-
-<Code
-  lang="typescript"
-  code={modelCustomProviderExample}
-  title="Minimal custom provider"
-/>
-
----
-
-## Tracing exporter
-
-When using the OpenAI provider you can opt‑in to automatic trace export by providing your API
-key:
-
-<Code
-  lang="typescript"
-  code={setTracingExportApiKeyExample}
-  title="Tracing exporter"
-/>
-
-This sends traces to the [OpenAI dashboard](https://platform.openai.com/traces) where you can
-inspect the complete execution graph of your workflow.
-
----
-
-## Next steps
-
-- Explore [running agents](/openai-agents-js/guides/running-agents).
-- Give your models super‑powers with [tools](/openai-agents-js/guides/tools).
-- Add [guardrails](/openai-agents-js/guides/guardrails) or [tracing](/openai-agents-js/guides/tracing) as needed.
-
-
-## Agents Powered by LLMs
-
-It helps to know that under the hood, your agents are powered by advanced AI language models. We won’t dive into technical model names (no need to worry about GPTs or anything like that). Instead, our platform keeps it simple with three AI levels: **Express**, **Core**, and **Ultra**. Each level corresponds to a different power of the AI brain:
-
-* **Express** — A lightweight, fast model. Great for quick, simple answers and basic tasks.
-* **Core** — A balanced model. Good all‑around capabilities for most customer interactions.
-* **Ultra** — The most powerful model. Excels at understanding complex questions and giving detailed answers, though it may be a bit slower.
-
-No matter which level you choose for your agent, the way to get great results is the same: provide clear instructions. All these AI levels learn from your instructions and attempt to follow them. So, for example, if your instruction says “Use a friendly, casual tone and offer product suggestions,” an Express agent will do that in a basic way, while an Ultra agent might do it with more polish and detail. In all cases, **you remain in control** by telling the AI how it should behave.
-
-> **Tip:** Select the right model tier for your use case is important. You can start with Express, and if the Agent is not able to handle the task, you can switch to Core or Ultra. This way you can ensure that the MAS run as quick as possible.
-> We suggest you to use Ultra if the task is critical.

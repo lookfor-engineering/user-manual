@@ -1,15 +1,45 @@
 ---
-title: Multi-agent Systems - Orchestrating multiple agents
+title: Multi-agent Systems (MASs)
 description: Coordinate the flow between several agents
 ---
 
 import simpleStorefrontMASArc from "../../../assets/simple-storefront-mas-arc.png";
 import { Image } from 'astro:assets';
 
+MASs are a team of agents that work together to achieve a common goal. You should orchestrate more than one agent in 
+a way that they efficiently do what you need to do. Orchestration refers to defining the flow of agents. Which agents run, in what order, 
+and how do they decide what happens next? Intelligence of an LLM is used to plan, reason, and decide on what steps to take based on that. 
+MAS is actually an abstract concept so the flow of a MAS is actually defined when creating its agents. 
 
-Orchestration refers to defining the flow of agents. Which agents run, in what order, 
-and how do they decide what happens next? Intelligence of an LLM is used to plan, reason, 
-and decide on what steps to take based on that. MAS is actually an abstract concept so the flow of a MAS is actually defined when creating itsAgents. 
+
+### Types of MASs
+
+If you already read [agents](/user-manual/guides/agents) guide, you know that the resources (tools, context, etc.) that an agent can use are different for each type of the MAS.
+If an agent belongs to a MAS, it will have the resources of that MAS type. For example, sender's email address is available in the context of an email MAS but not in a storefront MAS.
+Similarly `Add to Cart` may be available in the context of a storefront MAS but doesn't make sense in an email MAS since it is not possible to add to cart from an email.
+
+There are four main types of MASs we currently support:
+- **Storefront MASs**: `conversational` These MASs are used to answer inquiries coming from the chatbot in the storefront. You can create more than one storefront MAS but you have to assign one of them to the chatbot. When assigned to the chatbot, this MAS will run once with every incoming message. 
+- **Email MASs**: `conversational` These MASs are used to answer inquiries coming from the email. You can create more than one email MAS but every [email integration](/user-manual/guides/email-integration) has to be assigned to one of them. When assigned to the email integration, this MAS will run once with every incoming email.
+- **Content MASs**: `background` Blog/content generator that works on a schedule – e.g., weekly SEO posts
+- **Conversation Insights MASs**: `background` Post‑conversation summaries and insights.
+
+### What does conversational and background mean?
+
+They are two labels for MASs. They don't affect the resources of the MAS but they are important to understand the purpose of the MAS.
+It is always conversations that come to mind first when we think of LLMs and AI Agents. 
+However, an Agent or a MAS can be used for many other tasks thanks to the tools it can use.
+For example, an Agent in Content MAS can generate content and share it as a blog post using the **PublishBlogPostTool**.
+In this case, the MAS doesn't produce a text answer but takes an action as the final output.
+ 
+ - **Conversational MASs**: These MASs are used to answer inquiries coming from any channel. Currently email and storefront messenger is supported.
+ If a MAS is conversational, it's purpose is to do what the customer asks and send a text response as a result. You can use [Inbox](/user-manual/guides/inbox) in the dashboard to monitor the conversations.
+ - **Background MASs**: These MASs that runs in the background. They don't send a response to the customer. They are used to perform tasks like data analysis, data processing, etc.
+ Content MAS or Conversation Insights MAS are some examples of background MASs.
+
+
+
+### How to orchestrate agents to form a MAS?
 There are three main parameters of an Agent that controls the flow of a MAS:
 - **Entry Agent**: This is a very basic configuration for an Agent. You can select the agent that will be the entry point of the MAS.
 Then the agent will be the first one to run. Remember that there can be only one entry agent per MAS.
@@ -78,3 +108,12 @@ This pattern is great when the task is open-ended and you want to rely on the in
 1. Invest in good prompts. Make it clear what tools are available, how to use them, and what parameters it must operate within.
 2. Monitor your MAS and iterate on it. See where things go wrong, and iterate on your prompts.
 3. Have specialized agents that excel in one task, rather than having a general purpose agent that is expected to be good at anything.
+
+## Best Practices for Multi-agent Systems
+
+* **Single Responsibility:** One topic per agent.
+* **Clear Handoff Descriptions:** No ambiguity in the handoff descriptions.
+* **Short Pipelines:** Avoid >3 deep nested handoffs especially for conversational MASs
+* **Monitor & Iterate:** Use the dashboard to monitor and refine the MAS.
+
+---
