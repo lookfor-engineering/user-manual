@@ -28,7 +28,7 @@ Below is a distilled set of *prompt‑engineering* guidelines adapted from the o
 
 > **Quick start:** Always begin by stating *what the agent should do* in one sentence, then add any important constraints (tone, length, tools). Use triple quotes (`"""`) or hash lines (`###`) to separate your instruction from example text, and include dynamic variables where relevant.
 
-### 1 · Put the Instruction First and Separate Context
+#### 1  Put the Instruction First and Separate Context
 
 Less effective ❌
 
@@ -47,12 +47,12 @@ Text: """
 """
 ```
 
-### 2 · Be Specific and Detailed
+#### 2  Be Specific and Detailed
 
 Less effective ❌ `Write a poem about our store.`
 Better ✅ `Write a 4‑line, uplifting poem about eco‑friendly packaging in the style of Maya Angelou.`
 
-### 3 · Show the Desired Output Format
+#### 3  Show the Desired Output Format
 
 When possible, *show* the agent the exact pattern you expect:
 
@@ -63,17 +63,17 @@ People names: <comma_separated>
 ...
 ```
 
-### 4 · Start Zero‑Shot → Few‑Shot → Fine‑Tune
+#### 4  Start Zero‑Shot → Few‑Shot → Fine‑Tune
 
 1. **Zero‑shot:** give the task only.
 2. **Few‑shot:** add 1‑3 example pairs if zero‑shot is weak.
 3. **Fine‑tune:** contact us if you need custom training.
 
-### 5 · Avoid Vague or Fluffy Phrases
+#### 5  Avoid Vague or Fluffy Phrases
 
 Instead of *"make it a bit shorter"*, say *"Limit to 3 sentences."*
 
-### 6 · Say What *To* Do, Not Only What *Not* to Do
+#### 6  Say What *To* Do, Not Only What *Not* to Do
 
 Rather than *"DO NOT ask for password"*, use:
 *"Politely direct users to the ‘Reset Password’ page if they mention login issues; do **not** request any password."*a
@@ -91,9 +91,9 @@ Especially if a MAS interacts directly with customers (Storefront MAS, Email MAS
 A Good Methodology: You can start with Express, and if the Agent is not able to handle the task, you can switch to Core or Ultra. 
 This way you can ensure that the MAS run as quick as possible while still being able to handle the task.
 
-## Personalizing Responses with Dynamic Variables
+## Personalizing Responses with Context Variables
 
-One powerful feature of agent instructions is the ability to include **dynamic variables**. Dynamic variables are placeholders that the system will fill in with actual customer, shop, or session data at runtime. They let your AI personalize its output, making the conversation (or email) feel more natural and tailored to the individual customer.
+One powerful feature of agent instructions is the ability to include **[context variables](/user-manual/guides/context)**. Context variables are placeholders that the system will fill in with actual customer, shop, or session data at runtime. They let your AI personalize its output, making the conversation (or email) feel more natural and tailored to the individual customer.
 
 Here are a few commonly‑used variables you might see in **Storefront** or **Email** MAS:
 

@@ -1,0 +1,124 @@
+---
+title: Storefront MAS
+description: Learn what a Storefront MAS is and how to create one
+---
+
+A **Storefront MAS** (Multi-Agent System) handles customer conversations from the storefront chatbot. Each agent has access to a predefined set of context variables that provide insights into the customer, session, shop, and navigation state. These can be used in prompts or tool calls to personalize and control behavior.
+
+---
+
+## Context Variables
+
+| **Label** | **Name** | **Description** |
+|-----------|----------|-----------------|
+| **Shop MyShopify Domain** | `shop.myshopifyDomain` | The store’s Shopify domain, e.g., `example.myshopify.com` |
+| **Shop Name** | `shop.name` | The public name of the shop |
+| **Shop URL** | `shop.url` | The store's full URL |
+| **Shop Email** | `shop.email` | Email address of the shop owner |
+| **Shop Currency Code** | `shop.currencyCode` | Store currency (e.g., USD, EUR, GBP) |
+| **Customer ID** | `customer.id` | Unique identifier for the logged-in customer |
+| **Customer First Name** | `customer.firstName` | Customer’s first name |
+| **Customer Last Name** | `customer.lastName` | Customer’s last name |
+| **Customer Email** | `customer.email` | Email address of the customer |
+| **Customer Phone** | `customer.phone` | Phone number of the customer |
+| **Customer Logged In?** | `customer.loggedIn` | Whether the customer is logged in (`true`/`false`) |
+| **Customer's Email Verified?** | `customer.verifiedEmail` | Whether the customer's email is verified (`true`/`false`) |
+| **Session ID** | `session.id` | Unique identifier for the session |
+| **Language Code** | `session.languageCode` | ISO 639 language code for the session (e.g., `en`, `de`, `tr`) |
+| **IP Address** | `session.meta.ipAddress` | Visitor’s IP address |
+| **Country** | `session.meta.location.country` | Country of the session (e.g., `US`, `DE`) |
+| **Region** | `session.meta.location.region` | Region or state (e.g., `NY`, `BW`) |
+| **City** | `session.meta.location.city` | City (e.g., `Berlin`, `New York`) |
+| **Device** | `session.device` | Visitor's device (e.g., `iPhone 16`) |
+| **Browser** | `session.browser` | Browser and version (e.g., `Chrome 132`) |
+| **Is Mobile?** | `session.isMobile` | Whether the session is on a mobile device |
+| **Medium** | `session.medium` | Source of the message; always `storefront` in Storefront MAS |
+| **Navigation Location Type** | `navigation_location.type` | Type of the current page (`product`, `collection`, `blog`) |
+| **Navigation Location Handle** | `navigation_location.handle` | Shopify handle of the current resource |
+| **Navigation Location Resource ID** | `navigation_location.resourceId` | Shopify GID of the resource being viewed |
+| **Store Open?** | `store_status.isOpen` | Whether the store is currently open (`true`/`false`) |
+| **Next Change in Business Timezone** | `store_status.nextChangeInBusinessTz` | Next open/close time in business timezone |
+| **Current Time in UTC** | `time.nowInUTC` | Current timestamp in UTC |
+| **Day of Week in UTC** | `time.dayOfWeekInUTC` | Day of the week in UTC (e.g., Monday) |
+
+--- 
+
+## Built-in Tools
+
+| **Tool Name**                    | **Description**                                                                        | **Parameters**                                                                          |
+| -------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `cancel_order`                   | Cancels a Shopify order by ID and reason. Sends refund, restock, and email by default. | `orderId` (string), `reason` (enum: CUSTOMER, DECLINED, FRAUD, INVENTORY, OTHER, STAFF) |
+| `create_discount_code`           | Creates a percentage or fixed discount code, optionally scoped to specific products.   | `type` (percentage \| fixed), `value` (number), `productIds` (string\[])                |
+| `get_customer_orders`            | Fetches customer orders using email with pagination support.                           | `email` (string), `after` (string), `limit` (number)                                    |
+| `get_order_details`              | Fetches detailed information of an order by ID (must start with `#`).                  | `orderId` (string)                                                                      |
+| `get_product_details`            | Retrieves product data by ID, name, or key feature using search or embedding.          | `queryType` (id \| name \| key feature), `queryKey` (string)                            |
+| `get_product_recommendations`    | Recommends products based on query keys and optional filters (price, size).            | `queryKeys` (string\[]), `filters` (object with `price` and `size`)                     |
+| `get_collection_recommendations` | Recommends product collections based on query keys using vector search.                | `queryKeys` (string\[])                                                                 |
+| `get_related_knowledge_source`   | Retrieves FAQs, blog articles, PDFs, or Shopify pages relevant to a question.          | `question` (string), `specificToProductId` (string \| null)                             |
+| `send_email`                     | Sends an email to a customer with subject, plain text body, and HTML content.          | `email` (string), `subject` (string), `body` (string), `html` (string)                  |
+| `send_otp_email`                 | Sends an OTP email to the customer for verification.                                   | `email` (string)                                                                        |
+| `send_note`                      | Sends a private note to the dashboard visible only to store staff.                     | `content` (string)                                                                      |
+
+## Type Specific Settings
+
+- **Welcome Message** - The message that is sent to the customer when they start a conversation.
+- **Conversation Starters** - The `suggestive_answers` that is sent to the customer when they start a conversation.
+
+
+## Output Format
+
+Here’s a clean and user-friendly **documentation section** for the **Agent Output Types** of both **Email MAS** and **Storefront MAS**, ready to be placed in your **User Manual**:
+
+---
+
+## Agent Output Structure
+
+Agents produce structured responses when they complete their tasks. The response format differs depending on whether the MAS is an **Email MAS** or a **Storefront MAS**.
+
+---
+
+### Email MAS Output Structure
+
+---
+
+### Storefront MAS Output Structure
+
+
+| **Field**              | **Type**   | **Description**                                                                                                 |
+| ---------------------- | ---------- | --------------------------------------------------------------------------------------------------------------- |
+| `content`              | `string`   | The main message to show to the customer.                                                                       |
+| `suggestive_answers`   | `string[]` | Optional list of buttons the customer can click (e.g., “Track my order”).                                       |
+| `recommended_products` | `string[]` | Array of Shopify product IDs (e.g., `gid://shopify/Product/12345`) to show as product cards.                    |
+| `forms`                | `object[]` | Optional list of forms that the agent wants the user to fill. Each form contains a `type` and list of `fields`. |
+
+**Form Schema:**
+
+```ts
+{
+  type: string;         // e.g., "contact", "return_request"
+  fields: {
+    name: string;       // Field name
+    type: string;       // e.g., "text", "email", "number"
+  }[]
+}
+```
+
+**Example:**
+
+```json
+{
+  "content": "I can help with that. Please fill in the form below.",
+  "suggestive_answers": ["Cancel my order", "Track shipment"],
+  "recommended_products": ["gid://shopify/Product/123", "gid://shopify/Product/456"],
+  "forms": [
+    {
+      "type": "return_request",
+      "fields": [
+        { "name": "Order ID", "type": "text" },
+        { "name": "Reason", "type": "text" }
+      ]
+    }
+  ]
+}
+```
+

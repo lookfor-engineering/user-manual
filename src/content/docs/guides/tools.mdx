@@ -5,7 +5,8 @@ description: Provide your agents with capabilities via hosted tools or custom fu
 
 import { Aside, Steps, Code } from '@astrojs/starlight/components';
 
-Tools let an Agent **take actions** – fetch data, call external APIs, execute code. Lookfor agents supports three categories of tools:
+
+You can make your agents more powerful by adding tools to them. Tools let an Agent **take actions** – fetch data, call external APIs, execute code. Lookfor agents supports three categories of tools:
 
 1. **Built-in tools** – These are the tools provided by lookfor.ai. THe availability of tools to an agent depends on the type of the MAS the agent belongs to.
 2. **Agents as tools** – Agents can be used as tools. This is a powerful feature that allows you to create a very flexible and specialized MAS. We will cover this in the [Agents as tools](/user-manual/guides/tools#2-agents-as-tools) section.
@@ -19,10 +20,6 @@ The built-in tools are different for each type of the MAS. See the list of the t
  - [Storefront MAS Tools](/user-manual/guides/storefront-mas#tools)
  - [Email MAS Tools](/user-manual/guides/email-mas#tools)
  - [Content MAS Tools](/user-manual/guides/content-mas#tools)
- - [Marketing MAS Tools](/user-manual/guides/marketing-mas#tools)
- - [Sales MAS Tools](/user-manual/guides/sales-mas#tools)
- - [Customer Support MAS Tools](/user-manual/guides/customer-support-mas#tools)
- - [Product Management MAS Tools](/user-manual/guides/product-management-mas#tools)
 
  If you have a new tool idea/request, please [let us know](https://tally.so/r/3jqB41). 
 
@@ -36,8 +33,8 @@ To do that, add an agent to the tool list of the agent.
 Under the hood lookfor does the following:
 
 - Creates a single input parameter.
-- Runs the sub‑agent with that input when the tool is called. Notice that the sub-agent will not be able to see the conversation history. It won't know it is a part of a MAS. It will think that it runs solely for that input.
-- Returns the last message as tool's output to the caller agent.
+- Runs the sub‑MAS with that input when the tool is called. Notice that the sub-agent will not be able to see the conversation history. It won't know it is a part of a MAS. It will think that it runs solely for that input.
+- Returns the final output of the sub-MAS as tool's output to the caller agent.
 
 Let's say you want to create a MAS that translates French and Turkish texts to English. You can create three agents for that. 
  - French Translator Agent
@@ -53,6 +50,11 @@ Orchestrator agent will return the result of the two agents, edit the text if ne
 <Aside type="caution">
     Aware that, when you use agent handoffs, the sub-agent will be able to see the [conversation history](/user-manual/guides/agents#conversation-history).
     When you use agents as tools, the sub-agent will not be able to see the conversation history. It will think that it runs solely for that input.
+</Aside>
+
+<Aside type="caution">
+    Output type of a MAS is pre-determined by the type of the MAS. So, any agent that is able to be a final agent in a MAS must have the same output type as the MAS.
+    However, if an agent will only be used as a tool, or there is no possibility to be a final agent in a MAS (e.g. Triage Agent with `Tool Choice` set to `required`), you can set the output type of the agent. 
 </Aside>
 
 
@@ -86,12 +88,7 @@ Here is an example of a tool definition. If you want to create an API tool, clic
 
 ### Forcing tool use
 
-Supplying tools doesn’t guarantee the agent will use one. You can **force** tool use with
-`Tool Choice` setting in the advanced settings of the agent configuration:
-
-1. `'auto'` (default) – the agent decides whether to use a tool.
-2. `'required'` – the agent _must_ call a tool (it can choose which one). If you remember every handoff is a tool, you can use this setting to force the agent to delegate to another agent.
-3. `'none'` – the agent must **not** call a tool.
+Supplying tools doesn’t guarantee the agent will use one. You can **force** tool use with `Tool Choice` setting in the [Model Settings](/user-manual/guides/models) of the agent configuration.
 
 ### What happens after the tool is used?
 

@@ -10,18 +10,15 @@ Each agent has a set of tools and context. Each agent can use these tools and co
 In short, LLM is the brain of the agent, tools are the hands and context is the eyes. Agents has the following parameters that you can configure:
 - **Name** – the name of the agent.
 - **Handoff Description** – a description of what the agent can do. This description is used to decide which agent to delegate to. So a handoff description informs the parent agent about the capabilities of the child agent.
-- **Instructions** – the system prompt that tells the agent _who it is_ and _how it should respond_.
-- **Handoff Agents** – a list of agents that the current agent can delegate to.
-- **Tools** – a list of functions or APIs the model can invoke to accomplish a task. Depending on the type of the MAS, lookfor provides a set of useful tools for you to equip an agent of the MAS.
-- **Entry Agent** – a boolean value that indicates if the agent is the entry point of the MAS.
-- **Model** – determines how intelligent the agent is. The more intelligent the model, the more complex the agent can be. However, the more complex the agent, the more expensive it is to run in time and money.
-- **Tool Choice** – "auto" (default), "required" or "none" – the agent decides whether to use a tool.
-
+- **[Instructions](/user-manual/guides/prompt-engineeringg#what-are-agent-instructions)** – the system prompt that tells the agent _who it is_ and _how it should respond_.
+- **[Handoff Agents](/user-manual/guides/handoffs)** – a list of agents that the current agent can delegate to.
+- **[Tools](/user-manual/guides/tools)** – a list of functions or APIs the model can invoke to accomplish a task. Depending on the type of the MAS, lookfor provides a set of useful tools for you to equip an agent of the MAS.
+- **[Model Settings](/user-manual/guides/models)**  - The model settings of the agent.
 
 <Aside type="caution">
     LLMs [hallucinate](https://en.wikipedia.org/wiki/Hallucination_(artificial_intelligence)). This means that they may generate content that is not true to the facts or do not follow the instructions. 
-    [Writing Effective Agent Instructions](/openai-agents-js/guides/prompt-engineering) and [Following Single Responsibility Principle](/openai-agents-js/guides/single-responsibility) are powerful weapons to reduce hallucinations.
-    Also the more intelligent the model, the more likely it is to hallucinate because it will understand the instructions better.
+    [Writing Effective Agent Instructions](/user-manual/guides/prompt-engineering) and [Following Single Responsibility Principle](/user-manual/guides/single-responsibility) are powerful weapons to reduce hallucinations.
+    Also the more intelligent the model, the less likely it is to hallucinate because it will understand the instructions better.
 </Aside>
 
 ---
@@ -36,54 +33,6 @@ Instead, what we provide is a framework and infrastructure that you can use to b
 
 ## Context
 
-Agents are equipped with a set of context. Context is a set of variables that are available to the agent. 
-The context is different for each type of the MAS. For example storefront MAS has `customer.isLoggedIn` variable but an email MAS doesn't have it becuase being logged in is not a concept in email.
-You can find the list of the context variables for each type of the MAS [here](https://lookfor.ai/docs/guides/context).
-You can also use the context variables in the [instructions](#instructions).
+    Agents are equipped with a set of context. Context is a set of variables that are available to the agent. To learn more about context, see the [context](/user-manual/guides/context) guide.
 
 ---
-
-## Handoffs
-
-An Agent can **delegate** to other Agents. You select which agent an agent can delegate to when you create the agent.
-Back of the scene, a handoff is actually a tool that an agent can use to delegate to other agents.
-A common pattern is to use a _triage agent_ that routes the conversation to a more specialised sub‑agent.
-However, there are many more patterns you can use. See the [handoffs](/openai-agents-js/guides/handoffs) guide for more details.
-
----
-
-## Instructions
-
-Instructions are the system prompt that tells the agent _who it is_ and _how it should respond_. 
-Depending of the type of the multi-agent system, we provide a set of variables that you can use in the instructions. 
-As an example, for a storefront MAS, we provide the following variables:
-- `customer.isLoggedIn` – whether the customer is logged in. 
-- `customer.name` – the name of the customer.
-
-You can say in the instructions that if `customer.isLoggedIn` is true, you should say "Hello `customer.name`".
-
-See the [Writing Effective Agent Instructions](/user-manual/guides/prompt-engineering) guide to learn how to write good instructions.
-
----
-
-## Model
-
-An Agent is a proxy for an LLM. The model determines how intelligent the agent is. 
-The more intelligent the model, the more complex the agent can be. However, the more complex the agent, 
-the more expensive it is to run in time and money. There are three different models available for an agent:
- - Express – fastest response time, lowest quality (can be used for simple tasks or triage agents)
- - Core – the default model. It is a good choice for most tasks. Balanced quality and response time. 
- - Ultra – the slowest response time, highest quality. This model is different than express or core because it does reasoning by thinking step by step.
- It should only be used for complex tasks or agents that need to be very accurate because it may take longer to respond which causes the entire MAS to slow down.
- 
-See the [models](/openai-agents-js/guides/models) guide to learn more about models.
-
----
-
-## Tools
-
-You can supply tools to an agent. Tools are functions or APIs that the agent can invoke to accomplish a task. 
-There are many built-in tools available for agents. The available tools are different for each type of the MAS.
-There are many configuration options for the tools. Go to the [tools](/openai-agents-js/guides/tools) guide to learn more about the tools.
-You can find the list of the tools for each type of the MAS [here](https://lookfor.ai/docs/guides/tools).
-You can also [create your own API tools](/openai-agents-js/guides/tools) or [propose new tools to us](https://tally.so/r/3jqB41).

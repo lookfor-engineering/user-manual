@@ -1,42 +1,37 @@
 ---
 title: Models
-description: Choose and configure language models for your agents
+description: Choose and configure the language models that power your agents
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
+Your agents are powered by advanced AI language models (LLMs), which act as the “brain” behind the scenes. You can configure these models to control how your agents behave.
 
-It helps to know that under the hood, your agents are powered by advanced AI language models. 
-So every Agent ultimately calls an LLM. We won’t dive into technical model names (no need to worry about GPTs or anything like that). 
-Instead, our platform keeps it simple with three AI levels: **Express**, **Core**, and **Ultra**. Each level corresponds to a different power of the AI brain:
+### Model Options
 
-* **Express** — A lightweight, fast model. Great for quick, simple answers and basic tasks.
-* **Core** — A balanced model. Good all‑around capabilities for most customer interactions.
-* **Ultra** — The most powerful model. Thinks step by step and excels at understanding complex questions and giving detailed answers, though it may be a bit slower.
+Each model tier offers a different balance of speed, cost, and intelligence:
 
-No matter which level you choose for your agent, the way to get great results is the same: provide clear instructions. [Learn more about how to write great instructions](/user-manual/guides/prompt-engineering)
+* **Express** – Lightweight and fast. Ideal for simple tasks and quick replies.
+* **Core** *(default)* – A balanced choice. Handles most customer interactions well.
+* **Ultra** – The most advanced. Excels at understanding complex requests and reasoning step-by-step, though slightly slower.
 
-> **Tip:** Select the right model tier for your use case is important. You can start with Express, and if the Agent is not able to handle the task, 
-you can switch to Core or Ultra. This way you can ensure that the MAS run as quick as possible.
-> We suggest you to use Ultra if the task is critical.
----
+> **Tip:**
+> Start with **Express** to keep your agents fast and cost-efficient. If you notice performance issues or more complex needs, upgrade to **Core** or **Ultra**.
+> For critical tasks, we recommend using **Ultra**.
 
+### Additional Settings
 
-## Model Settings
+* **Tool Choice** – Controls how the agent uses tools:
 
-We provide a few settings to configure the model of an Agent. You can set them in Advanced Settings of an Agent. 
+  * `"auto"` *(default)*: Model decides when to use tools
+  * `"required"`: Tools must always be used
+  * `"none"`: Tool usage is disabled
+* **Parallel Tool Calls** – Enables calling multiple tools at once.
 
-| Field               | Type                                       | Notes                                                                     |
-| ------------------- | ------------------------------------------ | ------------------------------------------------------------------------- |
-| `temperature`       | `number`                                   | Creativity vs. determinism.                                               |
-| `topP`              | `number`                                   | Nucleus sampling.                                                         |
-| `frequencyPenalty`  | `number`                                   | Penalise repeated tokens.                                                 |
-| `presencePenalty`   | `number`                                   | Encourage new tokens.                                                     |
-| `maxTokens`         | `number`                                   | Maximum tokens in the response.                                           |
+  * `true` or `false` *(default: false)*
 
 <Aside type="caution">
-   Advanced settings have default values. Changing them without understanding the impact may cause unexpected results.
-   Please only change them if you know what you are doing.
+   Advanced settings come with safe defaults. Changing them without understanding their effect may lead to unexpected behavior. Only modify these if you're confident in what they do.
 </Aside>
 
----
+[Learn how to write clear instructions for your agents](/user-manual/guides/prompt-engineering) to get the best results—regardless of the model tier.

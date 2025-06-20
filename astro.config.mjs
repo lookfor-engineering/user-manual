@@ -55,6 +55,10 @@ const sidebar = [
         link: '/guides/tools',
 
       },
+       {
+        label: 'Context',
+        link: '/guides/context',
+      },
       {
         label: 'Models',
         link: '/guides/models',
